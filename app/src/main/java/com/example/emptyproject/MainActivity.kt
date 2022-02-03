@@ -8,8 +8,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val game = Game()
-        val field = Field()
-        val cell = Cell()
 
     }
 }
