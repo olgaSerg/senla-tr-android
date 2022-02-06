@@ -11,10 +11,6 @@ class Game {
         val cells = Array<Array<Cell>>(rows) { row -> Array<Cell>(columns) { column -> Cell(row, column) } }
         field = Field(cells)
     }
-
-    private fun createField() {
-
-    }
     private fun win() {}
     private fun gameOver() {}
     fun onLeftClick(x: Int, y: Int) {}
