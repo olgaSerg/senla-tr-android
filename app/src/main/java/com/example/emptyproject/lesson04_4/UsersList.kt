@@ -12,20 +12,26 @@ fun main() {
         "Максим" to listOf("Толя", "Алиса"),
         "Алиса" to listOf("Максим", "Катя"),
         "Катя" to listOf("Паша", "Женя", "Алиса"),
-        )
-    println(getFriends("Петя", h))
-}
+    )
 
-fun getFriends(name: String, h: HashMap<String, List<String>>): Set<String> {
-    val sn = mutableListOf<String>()
-    sn.add(name)
-    for (friend in h.getValue(name)) {
-        sn.add(friend)
-        for (each in h.getValue(friend)) {
-            sn.add(each)
+    val socialNet = SocialNet()
+
+    for (name in h.keys) {
+        socialNet.addUser(User(name))
+    }
+
+    for (userName in h.keys) {
+        val user = socialNet.findUser(userName)
+        for (friendName in h.getValue(userName)) {
+            val friend = socialNet.findUser(friendName)
+            user.addFriend(friend)
         }
     }
-    return sn.toSet()
+
+    val user = socialNet.findUser("Петя")
+    println(socialNet.findUserFriends(user))
 }
+
+
 
 
