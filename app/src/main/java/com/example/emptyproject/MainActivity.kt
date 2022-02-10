@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import java.awt.font.TextAttribute
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val editTextFirstNumber = findViewById<EditText>(R.id.edit_text_first_number)
         val editTextSecondNumber = findViewById<EditText>(R.id.edit_text_second_number)
+
         val textViewResult = findViewById<TextView>(R.id.text_view_result)
         val button = findViewById<Button>(R.id.button_sum)
 
@@ -24,13 +25,18 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-        editTextFirstNumber.setOnClickListener {
-            editTextFirstNumber.text = null
+        editTextFirstNumber.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                editTextFirstNumber.setText("")
+            }
         }
-        editTextSecondNumber.setOnClickListener {
-            editTextSecondNumber.text = null
+        editTextSecondNumber.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                editTextSecondNumber.setText("")
+            }
         }
     }
+
     private fun sum(a: Int, b: Int): Int {
         return a + b
     }
