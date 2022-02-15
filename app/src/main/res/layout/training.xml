@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/text_view_training"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/training"
+            android:textSize="@dimen/headline"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3"
+            />
+
+        <Button
+            android:id="@+id/button_entrance"
+            android:layout_width="327dp"
+            android:layout_height="64dp"
+            android:layout_marginStart="43dp"
+            android:layout_marginEnd="43dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/entrance"
+            android:textAllCaps="false"
+            android:textSize="@dimen/nomination"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_training"
+            />
+
+        <Button
+            android:id="@+id/button_registration"
+            android:layout_width="327dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="7dp"
+            android:text="@string/registration"
+            android:textAllCaps="false"
+            android:textSize="@dimen/nomination"
+            app:layout_constraintEnd_toEndOf="@+id/button_entrance"
+            app:layout_constraintStart_toStartOf="@+id/button_entrance"
+            app:layout_constraintTop_toBottomOf="@+id/button_entrance"
+             />
+
+        <Button
+            android:id="@+id/button_about"
+            android:layout_width="327dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/about"
+            android:textAllCaps="false"
+            android:textSize="@dimen/nomination"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/button_registration"
+            app:layout_constraintStart_toStartOf="@+id/button_registration"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

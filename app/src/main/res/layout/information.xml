@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/text_view_title_information"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:text="@string/information"
+        android:gravity="center_horizontal"
+        android:textSize="38sp"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.02"
+        />
+
+    <TextView
+        android:id="@+id/text_view_information"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="43dp"
+        android:layout_marginEnd="43dp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/nomination"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_view_title_information"
+         />
+
+    <Button
+        android:id="@+id/button_back_information"
+        android:layout_width="327dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/back"
+        android:textSize="@dimen/nomination"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="@id/text_view_information"
+        app:layout_constraintStart_toStartOf="@id/text_view_information"
+        app:layout_constraintBottom_toBottomOf="parent"
+         />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

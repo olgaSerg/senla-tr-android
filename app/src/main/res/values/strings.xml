@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">EmptyProject</string>
+    <string name="training">Training</string>
+    <string name="entrance">Вход</string>
+    <string name="registration">Регистрация</string>
+    <string name="about">О программе</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="passwordConfirmation">Повторите пароль</string>
+    <string name="personName">Имя</string>
+    <string name="personSurname">Фамилия</string>
+    <string name="male">Мужчина</string>
+    <string name="female">Женщина</string>
+    <string name="indeterminate">Не определилось</string>
+    <string name="additionalInformation">Дополнительная информация</string>
+    <string name="agreement">Я принимаю условия</string>
+    <string name="completeRegistration">Зарегистрироваться</string>
+    <string name="back">Назад</string>
+    <string name="information">Информация</string>
+    <string name="entry">Войти</string>
+
+
 </resources>
