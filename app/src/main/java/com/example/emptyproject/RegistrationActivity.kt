@@ -66,16 +66,10 @@ class RegistrationActivity : AppCompatActivity() {
                     name = editTextName.text.toString(),
                     surname = editTextSurname.text.toString(),
                     gender = getGender(radioGroup),
-                    addInformation = editTextAdditionalInformation.text.toString()
-                    )
+                    additionalInformation = editTextAdditionalInformation.text.toString()
+                )
                 intent.putExtra("information", information as Serializable)
-
-//                intent.putExtra("login", editTextLogin.text.toString())
-//                intent.putExtra("password", editTextPassword.text.toString())
-//                intent.putExtra("name", editTextName.text.toString())
-//                intent.putExtra("surname", editTextSurname.text.toString())
-//                intent.putExtra("gender", getGender(radioGroup))
-//                intent.putExtra("AddInformation", editTextAdditionalInformation.text.toString())
+                intent.putExtra("source", "registration")
                 startActivity(intent)
             }
         }
@@ -134,10 +128,13 @@ class RegistrationActivity : AppCompatActivity() {
         )
         return gendersMapping.getValue(radioButtonID)
     }
-    data class Information(val login: String? = null,
-                           val password: String? = null,
-                           val name: String? = null,
-                           val surname: String? = null,
-                           val gender: String? = null,
-                           val addInformation: String? = null): Serializable
+
+    data class Information(
+        val login: String? = null,
+        val password: String? = null,
+        val name: String? = null,
+        val surname: String? = null,
+        val gender: String? = null,
+        val additionalInformation: String? = null
+    ) : Serializable
 }

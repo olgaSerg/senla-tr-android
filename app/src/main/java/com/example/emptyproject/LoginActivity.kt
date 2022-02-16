@@ -28,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
                  val message = editTextLogin.text.toString()
                  intent.putExtra("name", message)
                  intent.putExtra("password", editTextPassword.text.toString())
+                 intent.putExtra("source", "login")
                  startActivity(intent)
              }
          }
