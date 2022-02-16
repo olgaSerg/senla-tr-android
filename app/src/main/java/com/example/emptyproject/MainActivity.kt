@@ -1,6 +1,5 @@
 package com.example.emptyproject
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -8,15 +7,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 
-
-const val EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE"
-
 class MainActivity : AppCompatActivity() {
     var buttonLogin: Button? = null
     var buttonRegistration: Button? = null
     var buttonAbout: Button? = null
 
-    @SuppressLint("QueryPermissionsNeeded")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.training)

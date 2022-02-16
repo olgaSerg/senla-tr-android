@@ -3,8 +3,10 @@ package com.example.emptyproject
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.RadioGroup
 import java.io.Serializable
 
 class RegistrationActivity : AppCompatActivity() {
@@ -61,12 +63,12 @@ class RegistrationActivity : AppCompatActivity() {
             if (isFormValid) {
                 val intent = Intent(this, InformationActivity::class.java)
                 val information = Information(
-                    login = editTextLogin.text.toString(),
-                    password = editTextPassword.text.toString(),
-                    name = editTextName.text.toString(),
-                    surname = editTextSurname.text.toString(),
+                    login = editTextLogin.text.toString().trim(),
+                    password = editTextPassword.text.toString().trim(),
+                    name = editTextName.text.toString().trim(),
+                    surname = editTextSurname.text.toString().trim(),
                     gender = getGender(radioGroup),
-                    additionalInformation = editTextAdditionalInformation.text.toString()
+                    additionalInformation = editTextAdditionalInformation.text.toString().trim()
                 )
                 intent.putExtra("information", information as Serializable)
                 intent.putExtra("source", "registration")
@@ -86,6 +88,7 @@ class RegistrationActivity : AppCompatActivity() {
     private fun checkFields(list: List<EditText>): Boolean {
         var allFilled = true
         for (each in list) {
+            each.error = null
             if (each.text.toString() == "") {
                 each.error = "Заполните пустое поле"
                 allFilled = false
@@ -95,6 +98,7 @@ class RegistrationActivity : AppCompatActivity() {
     }
 
     private fun checkMinLoginLength(login: EditText): Boolean {
+        login.error = null
         if (login.length() < 4) {
             login.error = "Минимальная длина 4 символа"
             return false
@@ -103,6 +107,7 @@ class RegistrationActivity : AppCompatActivity() {
     }
 
     private fun checkMinPasswordLength(password: EditText): Boolean {
+        password.error = null
         if (password.length() < 8) {
             password.error = "Минимальная длина 8 символов"
             return false
@@ -111,6 +116,7 @@ class RegistrationActivity : AppCompatActivity() {
     }
 
     private fun checkPasswordsMatch(password: EditText, passwordConfirmation: EditText): Boolean {
+        passwordConfirmation.error = null
         if (password.text.toString() != passwordConfirmation.text.toString()) {
             password.error = "Пароли не совпадают"
             passwordConfirmation.error = "Пароли не совпадают"

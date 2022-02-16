@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 
 class LoginActivity : AppCompatActivity() {
     var editTextLogin: EditText? = null
@@ -25,9 +24,8 @@ class LoginActivity : AppCompatActivity() {
          buttonLogin.setOnClickListener {
              if (checkLogin(editTextLogin, editTextPassword)) {
                  val intent = Intent(this, InformationActivity::class.java)
-                 val message = editTextLogin.text.toString()
-                 intent.putExtra("name", message)
-                 intent.putExtra("password", editTextPassword.text.toString())
+                 intent.putExtra("name", editTextLogin.text.toString().trim())
+                 intent.putExtra("password", editTextPassword.text.toString().trim())
                  intent.putExtra("source", "login")
                  startActivity(intent)
              }
@@ -42,6 +40,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun checkLogin(login: EditText, password: EditText): Boolean {
+        login.error = null
+        password.error = null
         if (login.text.toString() != "" && password.text.toString() != "") {
             return true
         }
@@ -53,6 +53,4 @@ class LoginActivity : AppCompatActivity() {
         }
         return false
     }
-
-
 }
