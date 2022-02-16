@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import java.io.Serializable
 
 class RegistrationActivity : AppCompatActivity() {
     var editTextLogin: EditText? = null
@@ -59,12 +60,22 @@ class RegistrationActivity : AppCompatActivity() {
 
             if (isFormValid) {
                 val intent = Intent(this, InformationActivity::class.java)
-                intent.putExtra("login", editTextLogin.text.toString())
-                intent.putExtra("password", editTextPassword.text.toString())
-                intent.putExtra("name", editTextName.text.toString())
-                intent.putExtra("surname", editTextSurname.text.toString())
-                intent.putExtra("gender", getGender(radioGroup))
-                intent.putExtra("AddInformation", editTextAdditionalInformation.text.toString())
+                val information = Information(
+                    login = editTextLogin.text.toString(),
+                    password = editTextPassword.text.toString(),
+                    name = editTextName.text.toString(),
+                    surname = editTextSurname.text.toString(),
+                    gender = getGender(radioGroup),
+                    addInformation = editTextAdditionalInformation.text.toString()
+                    )
+                intent.putExtra("information", information as Serializable)
+
+//                intent.putExtra("login", editTextLogin.text.toString())
+//                intent.putExtra("password", editTextPassword.text.toString())
+//                intent.putExtra("name", editTextName.text.toString())
+//                intent.putExtra("surname", editTextSurname.text.toString())
+//                intent.putExtra("gender", getGender(radioGroup))
+//                intent.putExtra("AddInformation", editTextAdditionalInformation.text.toString())
                 startActivity(intent)
             }
         }
@@ -123,4 +134,10 @@ class RegistrationActivity : AppCompatActivity() {
         )
         return gendersMapping.getValue(radioButtonID)
     }
+    data class Information(val login: String? = null,
+                           val password: String? = null,
+                           val name: String? = null,
+                           val surname: String? = null,
+                           val gender: String? = null,
+                           val addInformation: String? = null): Serializable
 }

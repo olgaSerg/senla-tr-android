@@ -20,13 +20,15 @@ class InformationActivity : AppCompatActivity() {
         val message2 = intent.getStringExtra("password")
         "Логин: $message1 \nПароль: $message2".also { textViewInformation.text = it }
 
-        val message3 = intent.getStringExtra("login")
-        val message4 = intent.getStringExtra("password")
-        val message5 = intent.getStringExtra("name")
-        val message6 = intent.getStringExtra("surname")
-        val message7 = intent.getStringExtra("gender")
-        val message8 = intent.getStringExtra("AddInformation")
-        "Логин: $message3 \nПароль: $message4 \nИмя: $message5 \nФамилия: $message6 \nПол: $message7 \nДополнительная информация: $message8".also { textViewInformation.text = it }
+        val message3 = intent.getSerializableExtra("information") as? RegistrationActivity.Information
+        "Логин: $message3 \n".also { textViewInformation.text = it }
+//        val message3 = intent.getStringExtra("login")
+//        val message4 = intent.getStringExtra("password")
+//        val message5 = intent.getStringExtra("name")
+//        val message6 = intent.getStringExtra("surname")
+//        val message7 = intent.getStringExtra("gender")
+//        val message8 = intent.getStringExtra("AddInformation")
+//        "Логин: $message3 \nПароль: $message4 \nИмя: $message5 \nФамилия: $message6 \nПол: $message7 \nДополнительная информация: $message8".also { textViewInformation.text = it }
 
         buttonBack = findViewById(R.id.button_back_information)
         val buttonBack = buttonBack ?: return
