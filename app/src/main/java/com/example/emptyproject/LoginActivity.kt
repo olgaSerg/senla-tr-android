@@ -11,6 +11,7 @@ class LoginActivity : AppCompatActivity() {
     var editTextPassword: EditText? = null
     var buttonLogin: Button? = null
     var buttonBack: Button? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
@@ -26,7 +27,7 @@ class LoginActivity : AppCompatActivity() {
                  val intent = Intent(this, InformationActivity::class.java)
                  intent.putExtra("name", editTextLogin.text.toString().trim())
                  intent.putExtra("password", editTextPassword.text.toString().trim())
-                 intent.putExtra("source", "login")
+                 intent.putExtra(KEY_SIGN_UP, "login")
                  startActivity(intent)
              }
          }

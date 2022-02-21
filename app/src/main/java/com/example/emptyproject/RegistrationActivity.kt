@@ -7,7 +7,8 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RadioGroup
-import java.io.Serializable
+
+const val KEY_SIGN_UP = "source"
 
 class RegistrationActivity : AppCompatActivity() {
     var editTextLogin: EditText? = null
@@ -25,16 +26,7 @@ class RegistrationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration)
 
-        editTextLogin = findViewById(R.id.edit_text_login_registration)
-        editTextPassword = findViewById(R.id.edit_text_password_registration)
-        editTextPasswordConfirmation = findViewById(R.id.edit_text_password_confirmation)
-        editTextName = findViewById(R.id.edit_text_name_registration)
-        editTextSurname = findViewById(R.id.edit_text_surname_registration)
-        radioGroup = findViewById(R.id.radio_group)
-        buttonCompleteRegistration = findViewById(R.id.button_complete_registration)
-        editTextInformation = findViewById(R.id.edit_text_additional_information)
-        checkBox = findViewById(R.id.check_box_agreement)
-        buttonBack = findViewById(R.id.button_back)
+        initFields()
 
         val editTextLogin = editTextLogin ?: return
         val editTextPassword = editTextPassword ?: return
@@ -52,17 +44,17 @@ class RegistrationActivity : AppCompatActivity() {
         buttonCompleteRegistration.setOnClickListener {
 
             val validationResults = listOf(
+                checkFields(list),
                 checkMinLoginLength(editTextLogin),
                 checkPasswordsMatch(editTextPassword, editTextPasswordConfirmation),
                 checkMinPasswordLength(editTextPassword),
-                checkFields(list),
             )
 
             val isFormValid = validationResults.all { it }
 
             if (isFormValid) {
                 val intent = Intent(this, InformationActivity::class.java)
-                val information = Information(
+                val personInformation = PersonInformation(
                     login = editTextLogin.text.toString().trim(),
                     password = editTextPassword.text.toString().trim(),
                     name = editTextName.text.toString().trim(),
@@ -70,8 +62,8 @@ class RegistrationActivity : AppCompatActivity() {
                     gender = getGender(radioGroup),
                     additionalInformation = editTextAdditionalInformation.text.toString().trim()
                 )
-                intent.putExtra("information", information as Serializable)
-                intent.putExtra("source", "registration")
+                intent.putExtra("information", personInformation)
+                intent.putExtra(KEY_SIGN_UP, "registration")
                 startActivity(intent)
             }
         }
@@ -83,6 +75,19 @@ class RegistrationActivity : AppCompatActivity() {
         buttonBack.setOnClickListener {
             finish()
         }
+    }
+
+    private fun initFields() {
+        editTextLogin = findViewById(R.id.edit_text_login_registration)
+        editTextPassword = findViewById(R.id.edit_text_password_registration)
+        editTextPasswordConfirmation = findViewById(R.id.edit_text_password_confirmation)
+        editTextName = findViewById(R.id.edit_text_name_registration)
+        editTextSurname = findViewById(R.id.edit_text_surname_registration)
+        radioGroup = findViewById(R.id.radio_group)
+        buttonCompleteRegistration = findViewById(R.id.button_complete_registration)
+        editTextInformation = findViewById(R.id.edit_text_additional_information)
+        checkBox = findViewById(R.id.check_box_agreement)
+        buttonBack = findViewById(R.id.button_back)
     }
 
     private fun checkFields(list: List<EditText>): Boolean {
@@ -134,13 +139,4 @@ class RegistrationActivity : AppCompatActivity() {
         )
         return gendersMapping.getValue(radioButtonID)
     }
-
-    data class Information(
-        val login: String? = null,
-        val password: String? = null,
-        val name: String? = null,
-        val surname: String? = null,
-        val gender: String? = null,
-        val additionalInformation: String? = null
-    ) : Serializable
 }

@@ -16,8 +16,7 @@ class InformationActivity : AppCompatActivity() {
         textViewInformation = findViewById(R.id.text_view_information)
         val textViewInformation = textViewInformation ?: return
 
-        val source = intent.getStringExtra("source")
-        if (source == "login") {
+        if (KEY_SIGN_UP == "login") {
             val name = intent.getStringExtra("name")
             val password = intent.getStringExtra("password")
 
@@ -26,7 +25,7 @@ class InformationActivity : AppCompatActivity() {
                 Пароль: $password
             """.trimIndent()
         } else {
-            val information = intent.getSerializableExtra("information") as RegistrationActivity.Information
+            val information = intent.getSerializableExtra("information") as PersonInformation
             textViewInformation.text = """
                 Логин: ${information.login}
                 Пароль: ${information.password}
@@ -39,6 +38,7 @@ class InformationActivity : AppCompatActivity() {
 
         buttonBack = findViewById(R.id.button_back_information)
         val buttonBack = buttonBack ?: return
+
         buttonBack.setOnClickListener {
             finish()
         }

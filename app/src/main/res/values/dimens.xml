@@ -2,4 +2,8 @@
 <resources>
     <dimen name="headline">48sp</dimen>
     <dimen name="nomination">24sp</dimen>
+    <dimen name="horizontal_margin">43dp</dimen>
+    <dimen name="horizontal_padding">128dp</dimen>
+    <dimen name="vertical_padding">10dp</dimen>
+    <dimen name="margin_top">16dp</dimen>
 </resources>

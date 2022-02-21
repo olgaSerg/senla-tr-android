@@ -11,71 +11,75 @@
 
         <TextView
             android:id="@+id/text_view_entrance"
-            android:layout_width="0dp"
-            android:layout_height="66dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/entrance"
             android:textColor="@color/green"
             android:textSize="@dimen/headline"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="150dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.2"
             />
 
         <EditText
             android:id="@+id/edit_text_name"
             android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="43dp"
-            android:layout_marginEnd="43dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="43dp"
             android:layout_marginTop="24dp"
-            android:inputType="textPersonName"
-            android:hint="@string/login"
-            android:padding="5dp"
             android:background="@drawable/rectangle"
+            android:hint="@string/login"
+            android:inputType="textPersonName"
+            android:paddingVertical="15dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="230dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_entrance"
-            android:autofillHints="username" />
+            app:layout_constraintTop_toBottomOf="@id/text_view_entrance" />
 
         <EditText
             android:id="@+id/edit_text_password"
             android:layout_width="0dp"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:paddingVertical="15dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="230dp"
             android:inputType="textPassword"
             android:hint="@string/password"
-            android:padding="5dp"
             android:background="@drawable/rectangle"
-            app:layout_constraintEnd_toEndOf="@+id/edit_text_name"
-            app:layout_constraintStart_toStartOf="@+id/edit_text_name"
-            app:layout_constraintTop_toBottomOf="@+id/edit_text_name"
-            android:autofillHints="password"/>
+            app:layout_constraintEnd_toEndOf="@id/edit_text_name"
+            app:layout_constraintStart_toStartOf="@id/edit_text_name"
+            app:layout_constraintTop_toBottomOf="@id/edit_text_name" />
 
         <Button
             android:id="@+id/button_login"
             android:layout_width="0dp"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:paddingVertical="15dp"
             android:text="@string/entry"
             android:textSize="@dimen/nomination"
             android:textAllCaps="false"
-            app:layout_constraintEnd_toEndOf="@+id/edit_text_password"
-            app:layout_constraintStart_toStartOf="@+id/edit_text_password"
-            app:layout_constraintTop_toBottomOf="@+id/edit_text_password"/>
+            app:layout_constraintEnd_toEndOf="@id/edit_text_password"
+            app:layout_constraintStart_toStartOf="@id/edit_text_password"
+            app:layout_constraintTop_toBottomOf="@id/edit_text_password"/>
 
         <Button
             android:id="@+id/button_back"
             android:layout_width="0dp"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:layout_marginTop="130dp"
+            android:paddingVertical="15dp"
             android:text="@string/back"
             android:textSize="@dimen/nomination"
             android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/button_login"
-            app:layout_constraintStart_toStartOf="@+id/button_login" />
+            app:layout_constraintEnd_toEndOf="@id/button_login"
+            app:layout_constraintStart_toStartOf="@id/button_login"
+            app:layout_constraintTop_toBottomOf="@id/button_login"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
