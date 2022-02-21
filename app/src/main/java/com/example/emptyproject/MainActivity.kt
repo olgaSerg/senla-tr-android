@@ -6,8 +6,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 
-const val USER_NAME: String = "Name"
-const val USER_PASSWORD: String = "Password"
+private const val USER_NAME: String = "Name"
+private const val USER_PASSWORD: String = "Password"
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         buttonLogin = findViewById(R.id.button_login)
         buttonRegistration = findViewById(R.id.button_register)
         editTextName = findViewById(R.id.edit_text_person_name)
@@ -30,43 +31,43 @@ class MainActivity : AppCompatActivity() {
         val buttonRegistration = buttonRegistration ?: return
 
         buttonLogin.setOnClickListener {
-            checkLogin(editTextName, editTextPassword)
+            login(editTextName, editTextPassword)
         }
         buttonRegistration.setOnClickListener {
             checkRegistration(editTextName, editTextPassword)
         }
     }
 
-    private fun checkLogin(name: EditText, password: EditText) {
-        if (name.text.toString() == USER_NAME && password.text.toString() == USER_PASSWORD) {
-            val toast = Toast.makeText(applicationContext, "Авторизация прошла успешно", Toast.LENGTH_SHORT)
-            toast.show()
-            return
+    private fun login(name: EditText, password: EditText) {
+        if (isLoginFieldValid(name, password)) {
+            Toast.makeText(applicationContext, getString(R.string.authorization_successful), Toast.LENGTH_SHORT)
+                .show()
         }
 
         if (name.text.toString() != USER_NAME && name.text.toString() != "") {
-            name.error = "Неверное имя пользователя"
+            name.error = getString(R.string.invalid_username)
         } else if (name.text.toString() == "") {
-            name.error = "Заполните пустое поле"
+            name.error = getString(R.string.empty_field)
         }
 
         if (password.text.toString() != USER_PASSWORD && password.text.toString() != "") {
-            password.error = "Неверный пароль"
+            password.error = getString(R.string.invalid_password)
         } else if (password.text.toString() == "") {
-            password.error = "Заполните пустое поле"
+            password.error = getString(R.string.empty_field)
         }
     }
 
     private fun checkRegistration(name: EditText, password: EditText) {
         if (name.text.toString() != "" && password.text.toString() != "") {
-            val toast = Toast.makeText(applicationContext, "Регистрация прошла успешно", Toast.LENGTH_SHORT)
-            toast.show()
+            Toast.makeText(applicationContext, getString(R.string.registration_successful), Toast.LENGTH_SHORT).
+                show()
         } else {
-            val toast = Toast.makeText(applicationContext, "Заполните пустое поле", Toast.LENGTH_SHORT)
-            toast.show()
+            Toast.makeText(applicationContext, getString(R.string.empty_field), Toast.LENGTH_SHORT).
+                show()
         }
     }
+
+    private fun isLoginFieldValid(name: EditText, password: EditText): Boolean {
+        return (name.text.toString() == USER_NAME && password.text.toString() == USER_PASSWORD)
+    }
 }
-
-
-
