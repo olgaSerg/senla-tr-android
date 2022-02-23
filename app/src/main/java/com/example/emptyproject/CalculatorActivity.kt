@@ -1,14 +1,21 @@
 package com.example.emptyproject
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 
-class MainActivity : AppCompatActivity() {
+const val CURRENT_VALUE = "value"
+private const val CURRENT_ELEMENT = "number"
+private const val CURRENT_EXPRESSION = "expression"
+private const val IS_CALCULATION_FINISHED = "isCalculationFinished"
+
+class CalculatorActivity : AppCompatActivity() {
     var textViewCurrentElement: TextView? = null
     var textViewCalculation: TextView? = null
     var buttonC: Button? = null
+    var buttonOk: Button? = null
     var buttonZero: Button? = null
     var buttonOne: Button? = null
     var buttonTwo: Button? = null
@@ -28,7 +35,6 @@ class MainActivity : AppCompatActivity() {
     var currentExpression = arrayListOf<String>()
     var textToShowCurrentNumber = ""
     var isCalculationFinished = false
-    var expressionResult = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         initializeFields()
 
         val buttonC = buttonC ?: return
+        val buttonOk = buttonOk ?: return
         val buttonZero = buttonZero ?: return
         val buttonOne = buttonOne ?: return
         val buttonTwo = buttonTwo ?: return
@@ -123,14 +130,14 @@ class MainActivity : AppCompatActivity() {
                 val lastNumber = currentExpression[currentExpression.size - 1].toInt()
                 val lastOperation = currentExpression[currentExpression.size - 2]
 
-                expressionResult = calculateOperation(expressionResult, lastOperation, lastNumber)
+                val expressionResult = calculateOperation(textToShowCurrentNumber.toInt(), lastOperation, lastNumber)
                 setCurrentNumberText(expressionResult.toString())
             } else {
 
                 currentExpression.add(textToShowCurrentNumber)
                 displayExpression()
 
-                expressionResult = currentExpression[0].toInt()
+                var expressionResult = currentExpression[0].toInt()
                 for (i in 1 until currentExpression.size step 2) {
                     val currentOperation = currentExpression[i]
                     val currentNumber = currentExpression[i + 1].toInt()
@@ -145,6 +152,13 @@ class MainActivity : AppCompatActivity() {
                 isCalculationFinished = true
                 setCurrentNumberText(expressionResult.toString())
             }
+        }
+
+        buttonOk.setOnClickListener {
+            val intent = Intent()
+            intent.putExtra(CURRENT_VALUE, textToShowCurrentNumber)
+            setResult(RESULT_OK, intent)
+            finish()
         }
     }
 
@@ -213,6 +227,7 @@ class MainActivity : AppCompatActivity() {
         textViewCurrentElement = findViewById(R.id.text_view_current_element)
         textViewCalculation = findViewById(R.id.text_view_calculation)
         buttonC = findViewById(R.id.button_c)
+        buttonOk = findViewById(R.id.button_ok)
         buttonZero = findViewById(R.id.button_zero)
         buttonOne = findViewById(R.id.button_one)
         buttonTwo = findViewById(R.id.button_two)
@@ -232,16 +247,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("number", textViewCurrentElement?.text.toString())
-        outState.putSerializable("expression", currentExpression)
-        outState.putBoolean("isCalculationFinished", isCalculationFinished)
+        outState.putString(CURRENT_ELEMENT, textViewCurrentElement?.text.toString())
+        outState.putSerializable(CURRENT_EXPRESSION, currentExpression)
+        outState.putBoolean(IS_CALCULATION_FINISHED, isCalculationFinished)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val number = savedInstanceState.getString("number")
-        val expression = savedInstanceState.getSerializable("expression")
-        val isFinished = savedInstanceState.getBoolean("isCalculationFinished")
+        val number = savedInstanceState.getString(CURRENT_ELEMENT)
+        val expression = savedInstanceState.getSerializable(CURRENT_EXPRESSION)
+        val isFinished = savedInstanceState.getBoolean(IS_CALCULATION_FINISHED)
 
         number ?: return
         expression ?: return
