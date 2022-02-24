@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">EmptyProject</string>
+    <string name="create_file">Создать файл</string>
+    <string name="read_file">Просмотреть файл</string>
+    <string name="edit_file">Редактировать файл</string>
+    <string name="settings">Настройки</string>
+    <string name="small">small</string>
+    <string name="middle">middle</string>
+    <string name="large">large</string>
+    <string name="black">Black</string>
+    <string name="red">Red</string>
+    <string name="blue">Blue</string>
+    <string name="set_text_size">Установите размер текста</string>
+    <string name="set_text_color">Установите цвет текста</string>
 </resources>
