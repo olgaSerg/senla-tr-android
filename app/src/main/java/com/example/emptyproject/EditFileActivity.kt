@@ -26,29 +26,17 @@ class EditFileActivity : AppCompatActivity() {
             TEXT_EDITOR_SETTINGS,
             Context.MODE_PRIVATE)
 
-        val textSizes = hashMapOf(
-            "small" to 14F,
-            "middle" to 24F,
-            "large" to 48F
-        )
-
-        val textColors = hashMapOf(
-            "Black" to "#FF000000",
-            "Red" to "#FF0000",
-            "Blue" to "#001FCA"
-        )
-
         val savedTextColor = loadPreferencesTextColor()
         val savedTextSize = loadPreferencesTextSize()
         var newTextColor = Color.parseColor("#FF000000")
         var newTextSize = 14F
 
         if (savedTextSize != null) {
-            newTextSize = textSizes.getValue(savedTextSize)
+            newTextSize = getTextSize(savedTextSize)
         }
 
         if (savedTextColor != null) {
-            newTextColor = Color.parseColor(textColors.getValue(savedTextColor))
+            newTextColor = getTextColor(savedTextColor)
         }
 
         openFile(textViewFile, newTextSize, newTextColor)
@@ -84,5 +72,25 @@ class EditFileActivity : AppCompatActivity() {
 
     private fun loadPreferencesTextColor() : String? {
         return sharedPreferences?.getString(TEXT_COLOR, null)
+    }
+
+    private fun getTextColor(color: String): Int {
+        val textColors = hashMapOf(
+            "Black" to "#FF000000",
+            "Red" to "#FF0000",
+            "Blue" to "#001FCA"
+        )
+
+        return Color.parseColor(textColors.getValue(color))
+    }
+
+    private fun getTextSize(textSize: String): Float {
+        val textSizes = hashMapOf(
+            "small" to 14F,
+            "middle" to 24F,
+            "large" to 48F
+        )
+
+        return textSizes.getValue(textSize)
     }
 }

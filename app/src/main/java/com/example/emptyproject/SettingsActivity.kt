@@ -28,42 +28,14 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        radioButtonColorBlack = findViewById(R.id.radio_button_black)
-        radioButtonColorRed = findViewById(R.id.radio_button_red)
-        radioButtonColorBlue = findViewById(R.id.radio_button_blue)
-        radioButtonTextSmall = findViewById(R.id.radio_button_small)
-        radioButtonTextMiddle = findViewById(R.id.radio_button_middle)
-        radioButtonTextLarge = findViewById(R.id.radio_button_large)
-
-        val radioButtonColorBlack = radioButtonColorBlack ?: return
-        val radioButtonColorRed = radioButtonColorRed ?: return
-        val radioButtonColorBlue = radioButtonColorBlue ?: return
-        val radioButtonTextSmall = radioButtonTextSmall ?: return
-        val radioButtonTextMiddle = radioButtonTextMiddle ?: return
-        val radioButtonTextLarge = radioButtonTextLarge ?: return
+        initializeFields()
 
         sharedPreferences = getSharedPreferences(
             TEXT_EDITOR_SETTINGS,
             Context.MODE_PRIVATE)
 
-        val checkedTextColor = loadPreferencesTextColor() ?: "Black"
-        val textColors = hashMapOf(
-            "Black" to radioButtonColorBlack,
-            "Red" to radioButtonColorRed,
-            "Blue" to radioButtonColorBlue
-        )
-
-        textColors.getValue(checkedTextColor).isChecked = true
-
-        val checkedTextSize = loadPreferencesTextSize() ?: "small"
-        val textSizes = hashMapOf(
-            "small" to radioButtonTextSmall,
-            "middle" to radioButtonTextMiddle,
-            "large" to radioButtonTextLarge
-        )
-
-        textSizes.getValue(checkedTextSize).isChecked = true
-
+        setCheckedTextColor()
+        setCheckedTextSize()
         loadPreferencesTextSize()
     }
 
@@ -104,5 +76,36 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun loadPreferencesTextColor() : String? {
         return sharedPreferences?.getString(TEXT_COLOR, null)
+    }
+
+    private fun setCheckedTextColor() {
+        val checkedTextColor = loadPreferencesTextColor() ?: "Black"
+        val textColors = hashMapOf(
+            "Black" to radioButtonColorBlack,
+            "Red" to radioButtonColorRed,
+            "Blue" to radioButtonColorBlue
+        )
+
+        textColors.getValue(checkedTextColor)?.isChecked = true
+    }
+
+    private fun setCheckedTextSize() {
+        val checkedTextSize = loadPreferencesTextSize() ?: "small"
+        val textSizes = hashMapOf(
+            "small" to radioButtonTextSmall,
+            "middle" to radioButtonTextMiddle,
+            "large" to radioButtonTextLarge
+        )
+
+        textSizes.getValue(checkedTextSize)?.isChecked = true
+    }
+
+    private fun initializeFields() {
+        radioButtonColorBlack = findViewById(R.id.radio_button_black)
+        radioButtonColorRed = findViewById(R.id.radio_button_red)
+        radioButtonColorBlue = findViewById(R.id.radio_button_blue)
+        radioButtonTextSmall = findViewById(R.id.radio_button_small)
+        radioButtonTextMiddle = findViewById(R.id.radio_button_middle)
+        radioButtonTextLarge = findViewById(R.id.radio_button_large)
     }
 }
