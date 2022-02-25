@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
 import java.io.File
+import java.lang.StringBuilder
 
 class ReadFileActivity : AppCompatActivity() {
     var textViewFile: TextView? = null
@@ -74,14 +75,22 @@ class ReadFileActivity : AppCompatActivity() {
 
     private fun showText(textView: TextView, textSize: Float, textColor: Int) {
         val textFromFile = openFile()
-        val textLines = textFromFile.lines()
-        val numberedLines = mutableListOf<String>()
-        for (i in textLines.indices) {
-            numberedLines.add("${i + 1}. ${textLines[i]}")
-        }
-        val textToShow = numberedLines.joinToString(separator = "\n")
+        val newText = StringBuilder("1. $textFromFile")
+        var lineNumber = 1
 
-        textView.text = textToShow
+        for (i in textFromFile.indices) {
+            if (textFromFile[i] == '\n') {
+                lineNumber++
+            }
+        }
+        for (i in newText.length - 1 downTo 0) {
+            if (newText[i] == '\n') {
+                newText.insert(i + 1, "$lineNumber. ")
+                lineNumber--
+            }
+        }
+
+        textView.text = newText
         textView.textSize = textSize
         textView.setTextColor(textColor)
     }
