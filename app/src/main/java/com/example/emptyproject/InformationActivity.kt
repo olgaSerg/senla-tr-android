@@ -90,18 +90,20 @@ class InformationActivity : AppCompatActivity() {
         val savedValues = sharedPreferences?.getString(SAVED_VALUES, null) ?: return
 //        Log.v("msg", savedValues)
         val list = savedValues.split(", ")
-        for (i in 0..4) {
+        for (i in list.indices) {
             textViewList[i].text = list[i]
         }
     }
 
     private fun savePreferences() {
         val savedValuesList = arrayListOf<String>()
-        for (i in 0..4) {
+        for (i in 0 until textViewList.size) {
             savedValuesList.add(textViewList[i].text.toString())
         }
-        val e: SharedPreferences.Editor = sharedPreferences!!.edit()
-        e.putString(SAVED_VALUES, savedValuesList.joinToString())
-        e.apply()
+        sharedPreferences?.let {
+            val e: SharedPreferences.Editor = it.edit()
+            e.putString(SAVED_VALUES, savedValuesList.joinToString())
+            e.apply()
+        }
     }
 }
