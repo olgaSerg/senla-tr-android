@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 
+private const val NUMBER = "number"
+private const val EXPRESSION = "expression"
+private const val IS_CALCULATION_FINISHED = "isCalculationFinished"
+
 class MainActivity : AppCompatActivity() {
     var textViewCurrentElement: TextView? = null
     var textViewCalculation: TextView? = null
@@ -225,16 +229,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("number", textViewCurrentElement?.text.toString())
-        outState.putSerializable("expression", currentExpression)
-        outState.putBoolean("isCalculationFinished", isCalculationFinished)
+        outState.putString(NUMBER, textViewCurrentElement?.text.toString())
+        outState.putSerializable(EXPRESSION, currentExpression)
+        outState.putBoolean(IS_CALCULATION_FINISHED, isCalculationFinished)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val number = savedInstanceState.getString("number")
-        val expression = savedInstanceState.getSerializable("expression")
-        val isFinished = savedInstanceState.getBoolean("isCalculationFinished")
+        val number = savedInstanceState.getString(NUMBER)
+        val expression = savedInstanceState.getSerializable(EXPRESSION)
+        val isFinished = savedInstanceState.getBoolean(IS_CALCULATION_FINISHED)
 
         number ?: return
         expression ?: return
