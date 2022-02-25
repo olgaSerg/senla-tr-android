@@ -119,30 +119,79 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonEqual.setOnClickListener {
-            if (textToShowCurrentNumber == "" || isCalculationFinished) {
-                return@setOnClickListener
-            }
-
-            isCalculationFinished = true
-
-            currentExpression.add(textToShowCurrentNumber)
-            displayExpression()
-
-            expressionResult = currentExpression[0].toInt()
-            for (i in 1 until currentExpression.size step 2) {
-                val currentOperation = currentExpression[i]
-                val currentNumber = currentExpression[i + 1].toInt()
-
-                if (currentOperation == "/" && currentNumber == 0) {
-                    setCurrentNumberText("ERROR")
-                    return@setOnClickListener
-                }
-                expressionResult =
-                    calculateOperation(expressionResult, currentOperation, currentNumber)
-            }
-            isCalculationFinished = true
-            setCurrentNumberText(expressionResult.toString())
+            logicCalculateExpression(buttonEqual)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(NUMBER, textViewCurrentElement?.text.toString())
+        outState.putSerializable(EXPRESSION, currentExpression)
+        outState.putBoolean(IS_CALCULATION_FINISHED, isCalculationFinished)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val number = savedInstanceState.getString(NUMBER)
+        val expression = savedInstanceState.getSerializable(EXPRESSION) as ArrayList<String>
+        val isFinished = savedInstanceState.getBoolean(IS_CALCULATION_FINISHED)
+
+        number ?: return
+        expression ?: return
+
+        setCurrentNumberText(number)
+
+        currentExpression = expression
+        displayExpression()
+
+        isCalculationFinished = isFinished
+    }
+
+    private fun initializeFields() {
+        textViewCurrentElement = findViewById(R.id.text_view_current_element)
+        textViewCalculation = findViewById(R.id.text_view_calculation)
+        buttonC = findViewById(R.id.button_c)
+        buttonZero = findViewById(R.id.button_zero)
+        buttonOne = findViewById(R.id.button_one)
+        buttonTwo = findViewById(R.id.button_two)
+        buttonThree = findViewById(R.id.button_three)
+        buttonFour = findViewById(R.id.button_four)
+        buttonFive = findViewById(R.id.button_five)
+        buttonSix = findViewById(R.id.button_six)
+        buttonSeven = findViewById(R.id.button_seven)
+        buttonEight = findViewById(R.id.button_eight)
+        buttonNine = findViewById(R.id.button_nine)
+        buttonDivision = findViewById(R.id.button_division)
+        buttonMultiplication = findViewById(R.id.button_multiplication)
+        buttonPlus = findViewById(R.id.button_plus)
+        buttonMinus = findViewById(R.id.button_minus)
+        buttonEqual = findViewById(R.id.button_equal)
+    }
+
+    private fun logicCalculateExpression(buttonEqual: Button) {
+        if (textToShowCurrentNumber == "" || isCalculationFinished) {
+            return
+        }
+
+        isCalculationFinished = true
+
+        currentExpression.add(textToShowCurrentNumber)
+        displayExpression()
+
+        expressionResult = currentExpression[0].toInt()
+        for (i in 1 until currentExpression.size step 2) {
+            val currentOperation = currentExpression[i]
+            val currentNumber = currentExpression[i + 1].toInt()
+
+            if (currentOperation == "/" && currentNumber == 0) {
+                setCurrentNumberText("ERROR")
+                return
+            }
+            expressionResult =
+                calculateOperation(expressionResult, currentOperation, currentNumber)
+        }
+        isCalculationFinished = true
+        setCurrentNumberText(expressionResult.toString())
     }
 
     private fun setCurrentNumberText(currentText: String) {
@@ -204,50 +253,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return 0
-    }
-
-    private fun initializeFields() {
-        textViewCurrentElement = findViewById(R.id.text_view_current_element)
-        textViewCalculation = findViewById(R.id.text_view_calculation)
-        buttonC = findViewById(R.id.button_c)
-        buttonZero = findViewById(R.id.button_zero)
-        buttonOne = findViewById(R.id.button_one)
-        buttonTwo = findViewById(R.id.button_two)
-        buttonThree = findViewById(R.id.button_three)
-        buttonFour = findViewById(R.id.button_four)
-        buttonFive = findViewById(R.id.button_five)
-        buttonSix = findViewById(R.id.button_six)
-        buttonSeven = findViewById(R.id.button_seven)
-        buttonEight = findViewById(R.id.button_eight)
-        buttonNine = findViewById(R.id.button_nine)
-        buttonDivision = findViewById(R.id.button_division)
-        buttonMultiplication = findViewById(R.id.button_multiplication)
-        buttonPlus = findViewById(R.id.button_plus)
-        buttonMinus = findViewById(R.id.button_minus)
-        buttonEqual = findViewById(R.id.button_equal)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(NUMBER, textViewCurrentElement?.text.toString())
-        outState.putSerializable(EXPRESSION, currentExpression)
-        outState.putBoolean(IS_CALCULATION_FINISHED, isCalculationFinished)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        val number = savedInstanceState.getString(NUMBER)
-        val expression = savedInstanceState.getSerializable(EXPRESSION)
-        val isFinished = savedInstanceState.getBoolean(IS_CALCULATION_FINISHED)
-
-        number ?: return
-        expression ?: return
-
-        setCurrentNumberText(number)
-
-        currentExpression = expression as ArrayList<String>
-        displayExpression()
-
-        isCalculationFinished = isFinished
     }
 }
