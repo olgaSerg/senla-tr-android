@@ -10,29 +10,29 @@ private const val EXPRESSION = "expression"
 private const val IS_CALCULATION_FINISHED = "isCalculationFinished"
 
 class MainActivity : AppCompatActivity() {
-    var textViewCurrentElement: TextView? = null
-    var textViewCalculation: TextView? = null
-    var buttonC: Button? = null
-    var buttonZero: Button? = null
-    var buttonOne: Button? = null
-    var buttonTwo: Button? = null
-    var buttonThree: Button? = null
-    var buttonFour: Button? = null
-    var buttonFive: Button? = null
-    var buttonSix: Button? = null
-    var buttonSeven: Button? = null
-    var buttonEight: Button? = null
-    var buttonNine: Button? = null
-    var buttonDivision: Button? = null
-    var buttonMultiplication: Button? = null
-    var buttonPlus: Button? = null
-    var buttonMinus: Button? = null
-    var buttonEqual: Button? = null
+    private var textViewCurrentElement: TextView? = null
+    private var textViewCalculation: TextView? = null
+    private var buttonC: Button? = null
+    private var buttonZero: Button? = null
+    private var buttonOne: Button? = null
+    private var buttonTwo: Button? = null
+    private var buttonThree: Button? = null
+    private var buttonFour: Button? = null
+    private var buttonFive: Button? = null
+    private var buttonSix: Button? = null
+    private var buttonSeven: Button? = null
+    private var buttonEight: Button? = null
+    private var buttonNine: Button? = null
+    private var buttonDivision: Button? = null
+    private var buttonMultiplication: Button? = null
+    private var buttonPlus: Button? = null
+    private var buttonMinus: Button? = null
+    private var buttonEqual: Button? = null
 
-    var currentExpression = arrayListOf<String>()
-    var textToShowCurrentNumber = ""
-    var isCalculationFinished = false
-    var expressionResult = 0
+    private var currentExpression = arrayListOf<String>()
+    private var textToShowCurrentNumber = ""
+    private var isCalculationFinished = false
+    private var expressionResult = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +58,63 @@ class MainActivity : AppCompatActivity() {
         val buttonMinus = buttonMinus ?: return
         val buttonEqual = buttonEqual ?: return
 
+        setClickListeners(
+            buttonC, buttonZero, buttonOne, buttonTwo,
+            buttonThree, buttonFour, buttonFive, buttonSix,
+            buttonSeven, buttonEight, buttonNine, buttonDivision,
+            buttonMultiplication, buttonMinus, buttonPlus, buttonEqual)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(NUMBER, textViewCurrentElement?.text.toString())
+        outState.putSerializable(EXPRESSION, currentExpression)
+        outState.putBoolean(IS_CALCULATION_FINISHED, isCalculationFinished)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val number = savedInstanceState.getString(NUMBER)
+        val expression = savedInstanceState.getSerializable(EXPRESSION) as ArrayList<String>
+        val isFinished = savedInstanceState.getBoolean(IS_CALCULATION_FINISHED)
+
+        number ?: return
+
+        setCurrentNumberText(number)
+
+        currentExpression = expression
+        displayExpression()
+
+        isCalculationFinished = isFinished
+    }
+
+    private fun initializeFields() {
+        textViewCurrentElement = findViewById(R.id.text_view_current_element)
+        textViewCalculation = findViewById(R.id.text_view_calculation)
+        buttonC = findViewById(R.id.button_c)
+        buttonZero = findViewById(R.id.button_zero)
+        buttonOne = findViewById(R.id.button_one)
+        buttonTwo = findViewById(R.id.button_two)
+        buttonThree = findViewById(R.id.button_three)
+        buttonFour = findViewById(R.id.button_four)
+        buttonFive = findViewById(R.id.button_five)
+        buttonSix = findViewById(R.id.button_six)
+        buttonSeven = findViewById(R.id.button_seven)
+        buttonEight = findViewById(R.id.button_eight)
+        buttonNine = findViewById(R.id.button_nine)
+        buttonDivision = findViewById(R.id.button_division)
+        buttonMultiplication = findViewById(R.id.button_multiplication)
+        buttonPlus = findViewById(R.id.button_plus)
+        buttonMinus = findViewById(R.id.button_minus)
+        buttonEqual = findViewById(R.id.button_equal)
+    }
+
+    private fun setClickListeners(
+        buttonC: Button, buttonZero: Button, buttonOne: Button, buttonTwo: Button,
+        buttonThree: Button, buttonFour: Button, buttonFive: Button, buttonSix: Button,
+        buttonSeven: Button, buttonEight: Button, buttonNine: Button, buttonDivision: Button,
+        buttonMultiplication: Button, buttonMinus: Button, buttonPlus: Button, buttonEqual: Button
+    ) {
         buttonC.setOnClickListener {
             handleClearPressed()
         }
@@ -119,56 +176,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonEqual.setOnClickListener {
-            logicCalculateExpression(buttonEqual)
+            logicCalculateExpression()
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(NUMBER, textViewCurrentElement?.text.toString())
-        outState.putSerializable(EXPRESSION, currentExpression)
-        outState.putBoolean(IS_CALCULATION_FINISHED, isCalculationFinished)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        val number = savedInstanceState.getString(NUMBER)
-        val expression = savedInstanceState.getSerializable(EXPRESSION) as ArrayList<String>
-        val isFinished = savedInstanceState.getBoolean(IS_CALCULATION_FINISHED)
-
-        number ?: return
-        expression ?: return
-
-        setCurrentNumberText(number)
-
-        currentExpression = expression
-        displayExpression()
-
-        isCalculationFinished = isFinished
-    }
-
-    private fun initializeFields() {
-        textViewCurrentElement = findViewById(R.id.text_view_current_element)
-        textViewCalculation = findViewById(R.id.text_view_calculation)
-        buttonC = findViewById(R.id.button_c)
-        buttonZero = findViewById(R.id.button_zero)
-        buttonOne = findViewById(R.id.button_one)
-        buttonTwo = findViewById(R.id.button_two)
-        buttonThree = findViewById(R.id.button_three)
-        buttonFour = findViewById(R.id.button_four)
-        buttonFive = findViewById(R.id.button_five)
-        buttonSix = findViewById(R.id.button_six)
-        buttonSeven = findViewById(R.id.button_seven)
-        buttonEight = findViewById(R.id.button_eight)
-        buttonNine = findViewById(R.id.button_nine)
-        buttonDivision = findViewById(R.id.button_division)
-        buttonMultiplication = findViewById(R.id.button_multiplication)
-        buttonPlus = findViewById(R.id.button_plus)
-        buttonMinus = findViewById(R.id.button_minus)
-        buttonEqual = findViewById(R.id.button_equal)
-    }
-
-    private fun logicCalculateExpression(buttonEqual: Button) {
+    private fun logicCalculateExpression() {
         if (textToShowCurrentNumber == "" || isCalculationFinished) {
             return
         }
