@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/settings"
-        android:textSize="36sp"
+        android:textSize="@dimen/text_title_size"
         android:textColor="@color/black"
         android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/small"
-            android:textSize="14sp"
+            android:textSize="@dimen/text_small_size"
             android:checked="true"/>
 
         <RadioButton
@@ -40,14 +40,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/middle"
-            android:textSize="24sp"/>
+            android:textSize="@dimen/text_middle_size"/>
 
         <RadioButton
             android:id="@+id/radio_button_large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/large"
-            android:textSize="48sp"/>
+            android:textSize="@dimen/text_large_size"/>
     </RadioGroup>
 
     <RadioGroup
@@ -88,7 +88,7 @@
         android:layout_height="wrap_content"
         android:text="@string/set_text_size"
         android:layout_marginTop="20dp"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_subtitle_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_view_settings" />
@@ -99,7 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:text="@string/set_text_color"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_subtitle_size"
         app:layout_constraintEnd_toEndOf="@id/text_view_set_size"
         app:layout_constraintStart_toStartOf="@id/text_view_set_size"
         app:layout_constraintTop_toBottomOf="@id/radio_group_text_size" />

@@ -11,8 +11,8 @@ import android.widget.Toast
 import java.io.File
 
 class EditFileActivity : AppCompatActivity() {
-    var textViewFile: TextView? = null
-    var editTextFile: EditText? = null
+    private var textViewFile: EditText? = null
+    private var editTextFile: EditText? = null
     private var sharedPreferences: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,25 +22,14 @@ class EditFileActivity : AppCompatActivity() {
         textViewFile = findViewById(R.id.edit_text_file)
         val textViewFile = textViewFile ?: return
 
-        sharedPreferences = getSharedPreferences(
-            TEXT_EDITOR_SETTINGS,
-            Context.MODE_PRIVATE)
+        getObjectSharedPreferences()
+        getNewTextColor()
+        getNewTextSize()
 
-        val savedTextColor = loadPreferencesTextColor()
-        val savedTextSize = loadPreferencesTextSize()
-        var newTextColor = Color.parseColor("#FF000000")
-        var newTextSize = 14F
+        val newTextColor = getNewTextColor()
+        val newTextSize = getNewTextSize()
 
-        if (savedTextSize != null) {
-            newTextSize = getTextSize(savedTextSize)
-        }
-
-        if (savedTextColor != null) {
-            newTextColor = getTextColor(savedTextColor)
-        }
-
-        openFile(textViewFile, newTextSize, newTextColor)
-
+        showText(textViewFile, newTextSize, newTextColor)
     }
     override fun onPause() {
         super.onPause()
@@ -49,21 +38,23 @@ class EditFileActivity : AppCompatActivity() {
         saveFile(editTextFile)
     }
 
+    private fun getObjectSharedPreferences() {
+        sharedPreferences = getSharedPreferences(
+            TEXT_EDITOR_SETTINGS,
+            Context.MODE_PRIVATE)
+    }
+
     private fun saveFile(editText: EditText) {
         applicationContext.openFileOutput(FILENAME, Context.MODE_PRIVATE).use {
             it.write(editText.text.toString().toByteArray())
         }
-        Toast.makeText(applicationContext, "Файл сохранён", Toast.LENGTH_SHORT).show()
+        Toast.makeText(applicationContext, getString(R.string.file_saved), Toast.LENGTH_SHORT).show()
     }
 
-    private fun openFile(textView: TextView, textSize:Float, textColor: Int) {
-        val textFromFile =
-            File(applicationContext.filesDir, FILENAME)
+    private fun openFile(): String {
+        return File(applicationContext.filesDir, FILENAME)
                 .bufferedReader()
                 .use { it.readText(); }
-        textView.text = textFromFile
-        textView.textSize = textSize
-        textView.setTextColor(textColor)
     }
 
     private fun loadPreferencesTextSize() : String? {
@@ -92,5 +83,32 @@ class EditFileActivity : AppCompatActivity() {
         )
 
         return textSizes.getValue(textSize)
+    }
+
+    private fun getNewTextColor(): Int {
+        val savedTextColor = loadPreferencesTextColor()
+
+        return if (savedTextColor != null) {
+            getTextColor(savedTextColor)
+        } else
+            getColor(R.color.black)
+    }
+
+    private fun getNewTextSize(): Float {
+        val savedTextSize = loadPreferencesTextSize()
+
+        return if (savedTextSize != null) {
+            getTextSize(savedTextSize)
+        } else {
+            resources.getDimension(R.dimen.text_small_size)
+        }
+    }
+
+    private fun showText(textView: TextView, textSize: Float, textColor: Int) {
+        val textFromFile = openFile()
+
+        textView.text = textFromFile
+        textView.textSize = textSize
+        textView.setTextColor(textColor)
     }
 }

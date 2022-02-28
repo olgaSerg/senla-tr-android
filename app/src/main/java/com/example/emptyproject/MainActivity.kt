@@ -7,10 +7,10 @@ import android.widget.Button
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    var buttonCreate: Button? = null
-    var buttonRead: Button? = null
-    var buttonEdit: Button? = null
-    var buttonSettings: Button? = null
+    private var buttonCreate: Button? = null
+    private var buttonRead: Button? = null
+    private var buttonEdit: Button? = null
+    private var buttonSettings: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
