@@ -79,7 +79,7 @@ class InformationActivity : AppCompatActivity() {
             val name = data.getStringExtra(CURRENT_VALUE)
             textViewCurrentValue.text = name
         } else {
-            Toast.makeText(applicationContext, "calculation cancelled", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, getString(R.string.calculation_cancelled_message), Toast.LENGTH_SHORT).show()
         }
     }
 
