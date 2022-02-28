@@ -5,18 +5,19 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 
 private const val SAVED_VALUES = "savedValues"
 
 class InformationActivity : AppCompatActivity() {
-    var textViewFirstValue: TextView? = null
-    var textViewSecondValue: TextView? = null
-    var textViewThirdValue: TextView? = null
-    var textViewFourthValue: TextView? = null
-    var textViewFifthValue: TextView? = null
-    var buttonSave: TextView? = null
-    var buttonCalculator: TextView? = null
+    private var textViewFirstValue: TextView? = null
+    private var textViewSecondValue: TextView? = null
+    private var textViewThirdValue: TextView? = null
+    private var textViewFourthValue: TextView? = null
+    private var textViewFifthValue: TextView? = null
+    private var buttonSave: Button? = null
+    private var buttonCalculator: Button? = null
     private var textViewCurrentValue: TextView? = null
     private var sharedPreferences: SharedPreferences? = null
     private var textViewList = mutableListOf<TextView>()
@@ -33,13 +34,8 @@ class InformationActivity : AppCompatActivity() {
         val textViewThirdValue = textViewThirdValue ?: return
         val textViewFourthValue = textViewFourthValue ?: return
         val textViewFifthValue = textViewFifthValue ?: return
-        val textViewCurrentValue = textViewCurrentValue ?: return
         val buttonSave = buttonSave?: return
         val buttonCalculator = buttonCalculator ?: return
-
-        sharedPreferences = getSharedPreferences(
-            SAVED_VALUES,
-            Context.MODE_PRIVATE)
 
         textViewList = mutableListOf(
             textViewFirstValue,
@@ -49,20 +45,9 @@ class InformationActivity : AppCompatActivity() {
             textViewFifthValue
         )
 
+        getObjectSharedPreferences()
+        setClickListeners(buttonCalculator, buttonSave)
         loadPreferences()
-
-        buttonCalculator.setOnClickListener {
-            val intent = Intent(this, CalculatorActivity::class.java)
-            startActivityForResult(intent, 0)
-        }
-
-        buttonSave.setOnClickListener {
-            for (i in 0..3) {
-                textViewList[i].text = textViewList[i + 1].text
-            }
-            textViewList[4].text = textViewCurrentValue.text
-            savePreferences()
-        }
     }
 
     private fun initializeFields() {
@@ -76,6 +61,12 @@ class InformationActivity : AppCompatActivity() {
         buttonCalculator = findViewById(R.id.button_calculator)
     }
 
+    private fun getObjectSharedPreferences() {
+        sharedPreferences = getSharedPreferences(
+            SAVED_VALUES,
+            Context.MODE_PRIVATE)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val textViewCurrentValue = textViewCurrentValue ?: return
@@ -86,12 +77,21 @@ class InformationActivity : AppCompatActivity() {
         textViewCurrentValue.text = name
     }
 
-    private fun loadPreferences() {
-        val savedValues = sharedPreferences?.getString(SAVED_VALUES, null) ?: return
-//        Log.v("msg", savedValues)
-        val list = savedValues.split(", ")
-        for (i in list.indices) {
-            textViewList[i].text = list[i]
+    private fun setClickListeners(buttonCalculator: Button, buttonSave: Button) {
+        buttonCalculator.setOnClickListener {
+            val intent = Intent(this, CalculatorActivity::class.java)
+            startActivityForResult(intent, 0)
+        }
+        buttonSave.setOnClickListener {
+            for (i in 0..3) {
+                textViewList[i].text = textViewList[i + 1].text
+            }
+            if (textViewCurrentValue != null) {
+                textViewList[4].text = textViewCurrentValue!!.text
+                savePreferences()
+            } else {
+                return@setOnClickListener
+            }
         }
     }
 
@@ -104,6 +104,15 @@ class InformationActivity : AppCompatActivity() {
             val e: SharedPreferences.Editor = it.edit()
             e.putString(SAVED_VALUES, savedValuesList.joinToString())
             e.apply()
+        }
+    }
+
+    private fun loadPreferences() {
+        val savedValues = sharedPreferences?.getString(SAVED_VALUES, null) ?: return
+//        Log.v("msg", savedValues)
+        val list = savedValues.split(", ")
+        for (i in list.indices) {
+            textViewList[i].text = list[i]
         }
     }
 }
