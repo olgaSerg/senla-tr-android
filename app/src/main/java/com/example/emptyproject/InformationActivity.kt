@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 
 private const val SAVED_VALUES = "savedValues"
 
@@ -28,25 +29,10 @@ class InformationActivity : AppCompatActivity() {
         setContentView(R.layout.information)
 
         initializeFields()
-
-        val textViewFirstValue = textViewFirstValue ?: return
-        val textViewSecondValue = textViewSecondValue ?: return
-        val textViewThirdValue = textViewThirdValue ?: return
-        val textViewFourthValue = textViewFourthValue ?: return
-        val textViewFifthValue = textViewFifthValue ?: return
-        val buttonSave = buttonSave?: return
-        val buttonCalculator = buttonCalculator ?: return
-
-        textViewList = mutableListOf(
-            textViewFirstValue,
-            textViewSecondValue,
-            textViewThirdValue,
-            textViewFourthValue,
-            textViewFifthValue
-        )
+        setClickListeners()
+        createTextViewList()
 
         getObjectSharedPreferences()
-        setClickListeners(buttonCalculator, buttonSave)
         loadPreferences()
     }
 
@@ -59,6 +45,22 @@ class InformationActivity : AppCompatActivity() {
         textViewCurrentValue = findViewById(R.id.text_view_current_value)
         buttonSave = findViewById(R.id.button_save)
         buttonCalculator = findViewById(R.id.button_calculator)
+    }
+
+    private fun createTextViewList() {
+        val textViewFirstValue = textViewFirstValue ?: return
+        val textViewSecondValue = textViewSecondValue ?: return
+        val textViewThirdValue = textViewThirdValue ?: return
+        val textViewFourthValue = textViewFourthValue ?: return
+        val textViewFifthValue = textViewFifthValue ?: return
+
+        textViewList = mutableListOf(
+            textViewFirstValue,
+            textViewSecondValue,
+            textViewThirdValue,
+            textViewFourthValue,
+            textViewFifthValue
+        )
     }
 
     private fun getObjectSharedPreferences() {
@@ -77,12 +79,13 @@ class InformationActivity : AppCompatActivity() {
             val name = data.getStringExtra(CURRENT_VALUE)
             textViewCurrentValue.text = name
         } else {
-            super.onActivityResult(requestCode, resultCode, data);
-            return;
+            Toast.makeText(applicationContext, "calculation cancelled", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun setClickListeners(buttonCalculator: Button, buttonSave: Button) {
+    private fun setClickListeners() {
+        val buttonSave = buttonSave?: return
+        val buttonCalculator = buttonCalculator ?: return
         buttonCalculator.setOnClickListener {
             val intent = Intent(this, CalculatorActivity::class.java)
             startActivityForResult(intent, 0)

@@ -156,8 +156,7 @@ class CalculatorActivity : AppCompatActivity() {
         }
 
         buttonEqual.setOnClickListener {
-            logicCalculateExpression()
-
+            handleEqualPressed()
         }
 
         buttonOk.setOnClickListener {
@@ -202,7 +201,7 @@ class CalculatorActivity : AppCompatActivity() {
         setCurrentNumberText("")
     }
 
-    private fun logicCalculateExpression() {
+    private fun handleEqualPressed() {
         if (textToShowCurrentNumber == "") {
             return
         }
@@ -214,7 +213,6 @@ class CalculatorActivity : AppCompatActivity() {
             val expressionResult = calculateOperation(textToShowCurrentNumber.toInt(), lastOperation, lastNumber)
             setCurrentNumberText(expressionResult.toString())
         } else {
-
             currentExpression.add(textToShowCurrentNumber)
             displayExpression()
 
