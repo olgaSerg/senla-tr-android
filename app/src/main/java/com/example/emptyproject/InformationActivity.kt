@@ -69,12 +69,17 @@ class InformationActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val textViewCurrentValue = textViewCurrentValue ?: return
-        if (data == null) {
-            return
+        if (resultCode == RESULT_OK) {
+            val textViewCurrentValue = textViewCurrentValue ?: return
+            if (data == null) {
+                return
+            }
+            val name = data.getStringExtra(CURRENT_VALUE)
+            textViewCurrentValue.text = name
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+            return;
         }
-        val name = data.getStringExtra(CURRENT_VALUE)
-        textViewCurrentValue.text = name
     }
 
     private fun setClickListeners(buttonCalculator: Button, buttonSave: Button) {

@@ -66,9 +66,8 @@ class CalculatorActivity : AppCompatActivity() {
             buttonThree, buttonFour, buttonFive, buttonSix,
             buttonSeven, buttonEight, buttonNine, buttonDivision,
             buttonMultiplication, buttonMinus, buttonPlus, buttonEqual, buttonOk)
-
-
     }
+
     private fun initializeFields() {
         textViewCurrentElement = findViewById(R.id.text_view_current_element)
         textViewCalculation = findViewById(R.id.text_view_calculation)
@@ -157,36 +156,8 @@ class CalculatorActivity : AppCompatActivity() {
         }
 
         buttonEqual.setOnClickListener {
-            if (textToShowCurrentNumber == "") {
-                return@setOnClickListener
-            }
+            logicCalculateExpression()
 
-            if (isCalculationFinished) {
-                val lastNumber = currentExpression[currentExpression.size - 1].toInt()
-                val lastOperation = currentExpression[currentExpression.size - 2]
-
-                val expressionResult = calculateOperation(textToShowCurrentNumber.toInt(), lastOperation, lastNumber)
-                setCurrentNumberText(expressionResult.toString())
-            } else {
-
-                currentExpression.add(textToShowCurrentNumber)
-                displayExpression()
-
-                var expressionResult = currentExpression[0].toInt()
-                for (i in 1 until currentExpression.size step 2) {
-                    val currentOperation = currentExpression[i]
-                    val currentNumber = currentExpression[i + 1].toInt()
-
-                    if (currentOperation == "/" && currentNumber == 0) {
-                        setCurrentNumberText("ERROR")
-                        return@setOnClickListener
-                    }
-                    expressionResult =
-                        calculateOperation(expressionResult, currentOperation, currentNumber)
-                }
-                isCalculationFinished = true
-                setCurrentNumberText(expressionResult.toString())
-            }
         }
 
         buttonOk.setOnClickListener {
@@ -197,13 +168,13 @@ class CalculatorActivity : AppCompatActivity() {
         }
     }
 
-    private fun setCurrentNumberText(currentText: String) {
-        textToShowCurrentNumber = currentText
-        textViewCurrentElement?.text = textToShowCurrentNumber
-    }
+    private fun handleClearPressed() {
+        isCalculationFinished = false
 
-    private fun displayExpression() {
-        textViewCalculation?.text = currentExpression.joinToString(separator = " ")
+        setCurrentNumberText("")
+
+        currentExpression.clear()
+        displayExpression()
     }
 
     private fun handleDigitPressed(digitButton: Button) {
@@ -213,15 +184,6 @@ class CalculatorActivity : AppCompatActivity() {
 
         val pressedDigit = digitButton.text.toString()
         setCurrentNumberText(textToShowCurrentNumber + pressedDigit)
-    }
-
-    private fun handleClearPressed() {
-        isCalculationFinished = false
-
-        setCurrentNumberText("")
-
-        currentExpression.clear()
-        displayExpression()
     }
 
     private fun handleOperationPressed(operationButton: Button) {
@@ -238,6 +200,39 @@ class CalculatorActivity : AppCompatActivity() {
         currentExpression.add(operation)
         displayExpression()
         setCurrentNumberText("")
+    }
+
+    private fun logicCalculateExpression() {
+        if (textToShowCurrentNumber == "") {
+            return
+        }
+
+        if (isCalculationFinished) {
+            val lastNumber = currentExpression[currentExpression.size - 1].toInt()
+            val lastOperation = currentExpression[currentExpression.size - 2]
+
+            val expressionResult = calculateOperation(textToShowCurrentNumber.toInt(), lastOperation, lastNumber)
+            setCurrentNumberText(expressionResult.toString())
+        } else {
+
+            currentExpression.add(textToShowCurrentNumber)
+            displayExpression()
+
+            var expressionResult = currentExpression[0].toInt()
+            for (i in 1 until currentExpression.size step 2) {
+                val currentOperation = currentExpression[i]
+                val currentNumber = currentExpression[i + 1].toInt()
+
+                if (currentOperation == "/" && currentNumber == 0) {
+                    setCurrentNumberText("ERROR")
+                    return
+                }
+                expressionResult =
+                    calculateOperation(expressionResult, currentOperation, currentNumber)
+            }
+            isCalculationFinished = true
+            setCurrentNumberText(expressionResult.toString())
+        }
     }
 
     private fun calculateOperation(leftOperand: Int, operation: String, rightOperand: Int): Int {
@@ -258,7 +253,14 @@ class CalculatorActivity : AppCompatActivity() {
         return 0
     }
 
+    private fun setCurrentNumberText(currentText: String) {
+        textToShowCurrentNumber = currentText
+        textViewCurrentElement?.text = textToShowCurrentNumber
+    }
 
+    private fun displayExpression() {
+        textViewCalculation?.text = currentExpression.joinToString(separator = " ")
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
