@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.TypedValue
 import android.widget.TextView
 import java.io.File
 import java.lang.StringBuilder
@@ -59,12 +60,9 @@ class ReadFileActivity : AppCompatActivity() {
 
     private fun getTextSize(textSize: String): Float {
         val textSizes = hashMapOf(
-            getString(R.string.small) to 14F,
-            getString(R.string.middle) to 24F,
-            getString(R.string.large) to 36F
-//            getString(R.string.small) to resources.getDimension(R.dimen.text_small),
-//            getString(R.string.middle) to resources.getDimension(R.dimen.text_middle),
-//            getString(R.string.large) to resources.getDimension(R.dimen.text_large)
+            getString(R.string.small) to resources.getDimension(R.dimen.text_small_size),
+            getString(R.string.middle) to resources.getDimension(R.dimen.text_middle_size),
+            getString(R.string.large) to resources.getDimension(R.dimen.text_large_size)
         )
 
         return textSizes.getValue(textSize)
@@ -95,7 +93,7 @@ class ReadFileActivity : AppCompatActivity() {
         textFromFile.lines().forEachIndexed{ index, s -> newText.append("${index + 1}. $s\n") }
 
         textView.text = newText
-        textView.textSize = textSize
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
         textView.setTextColor(textColor)
     }
 }

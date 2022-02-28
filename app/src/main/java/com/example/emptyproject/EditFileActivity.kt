@@ -2,9 +2,9 @@ package com.example.emptyproject
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.TypedValue
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -67,19 +67,19 @@ class EditFileActivity : AppCompatActivity() {
 
     private fun getTextColor(color: String): Int {
         val textColors = hashMapOf(
-            "Black" to "#FF000000",
-            "Red" to "#FF0000",
-            "Blue" to "#001FCA"
+            getString(R.string.black) to getColor(R.color.black),
+            getString(R.string.red) to getColor(R.color.red),
+            getString(R.string.blue) to getColor(R.color.blue)
         )
 
-        return Color.parseColor(textColors.getValue(color))
+        return textColors.getValue(color)
     }
 
     private fun getTextSize(textSize: String): Float {
         val textSizes = hashMapOf(
-            "small" to 14F,
-            "middle" to 24F,
-            "large" to 48F
+            getString(R.string.small) to resources.getDimension(R.dimen.text_small_size),
+            getString(R.string.middle) to resources.getDimension(R.dimen.text_middle_size),
+            getString(R.string.large) to resources.getDimension(R.dimen.text_large_size)
         )
 
         return textSizes.getValue(textSize)
@@ -108,7 +108,7 @@ class EditFileActivity : AppCompatActivity() {
         val textFromFile = openFile()
 
         textView.text = textFromFile
-        textView.textSize = textSize
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
         textView.setTextColor(textColor)
     }
 }
