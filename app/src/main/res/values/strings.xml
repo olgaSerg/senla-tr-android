@@ -13,4 +13,6 @@
     <string name="set_text_size">Установите размер текста</string>
     <string name="set_text_color">Установите цвет текста</string>
     <string name="file_saved">Файл сохранён</string>
+    <string name="add_note">Добавить заметку</string>
+    <string name="empty_doc_name">Документ</string>
 </resources>

@@ -13,14 +13,9 @@
             android:name=".EditFileActivity"
             android:exported="false" />
         <activity
-            android:name=".ReadFileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CreateFileActivity"
-            android:exported="false" />
+            android:name=".EditFileActivity"
+            android:exported="false"
+            />
         <activity
             android:name=".MainActivity"
             android:exported="true">

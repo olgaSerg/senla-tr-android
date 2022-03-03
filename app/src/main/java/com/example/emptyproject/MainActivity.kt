@@ -3,67 +3,78 @@ package com.example.emptyproject
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ListView
 import java.io.File
 
+const val IS_NEW_FILE = "isNewFile"
+const val FILE_NAME = "fileName"
+
 class MainActivity : AppCompatActivity() {
+    private var filesListView : ListView? = null
     private var buttonCreate: Button? = null
-    private var buttonRead: Button? = null
-    private var buttonEdit: Button? = null
-    private var buttonSettings: Button? = null
+    private var adapter: ArrayAdapter<FileObject>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initializeFields()
-
-        val buttonCreate = buttonCreate ?: return
-        val buttonRead = buttonRead ?: return
-        val buttonEdit = buttonEdit ?: return
-        val buttonSettings = buttonSettings ?: return
-
-        setListeners(buttonCreate, buttonSettings, buttonRead, buttonEdit)
-    }
-
-    private fun initializeFields() {
+        filesListView = findViewById(R.id.list_view)
         buttonCreate = findViewById(R.id.button_create)
-        buttonRead = findViewById(R.id.button_read)
-        buttonEdit = findViewById(R.id.button_edit)
-        buttonSettings = findViewById(R.id.button_setting)
-    }
+        val filesListView = filesListView ?: return
 
-    private fun setListeners(buttonCreate: Button, buttonSettings: Button, buttonRead: Button, buttonEdit: Button) {
-        buttonCreate.setOnClickListener {
-            val intent = Intent(this, CreateFileActivity::class.java)
-            startActivity(intent)
-        }
+        createFilesDirectory()
 
-        buttonSettings.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        }
-
-        buttonRead.setOnClickListener {
-            val intent = Intent(this, ReadFileActivity::class.java)
-            startActivity(intent)
-        }
-
-        buttonEdit.setOnClickListener {
-            val intent = Intent(this, EditFileActivity::class.java)
-            startActivity(intent)
-        }
+        setClickListener()
+        val filesList = getFilesList()
+        setFilesListAdapter(filesList, filesListView)
+        setItemClickListener(filesListView)
     }
 
     override fun onResume() {
         super.onResume()
+        if (filesListView != null) {
+            val filesList = getFilesList()
+            setFilesListAdapter(filesList, filesListView!!)
+        }
+    }
 
-        val buttonRead = buttonRead ?: return
-        val buttonEdit = buttonEdit ?: return
+    private fun setClickListener() {
+        val buttonCreate = buttonCreate ?: return
+        buttonCreate.setOnClickListener {
+            val intent = Intent(this, EditFileActivity::class.java)
+            intent.putExtra(IS_NEW_FILE, true)
+            startActivity(intent)
+        }
+    }
 
-        if (File(applicationContext.filesDir, FILENAME).exists()) {
-            buttonRead.isEnabled = true
-            buttonEdit.isEnabled = true
+    private fun createFilesDirectory() {
+        val file = File(filesDir, "documents")
+        file.mkdir()
+    }
+
+    private fun getFilesList(): ArrayList<FileObject> {
+        val subDirectory = "documents"
+        val directory = File(filesDir, subDirectory)
+        return Utils.getDirectoryFiles(directory)
+    }
+
+    private fun setFilesListAdapter(filesList: ArrayList<FileObject>, filesListView: ListView) {
+        adapter = FilesListAdapter(this, filesList)
+        filesListView.adapter = adapter
+    }
+
+    private fun setItemClickListener(filesListView: ListView) {
+        filesListView.setOnItemClickListener { listView, itemView, position, id ->
+            val currentFile: FileObject = adapter!!.getItem(position)!!
+            val intent = Intent(
+                this@MainActivity,
+                EditFileActivity::class.java
+            )
+            intent.putExtra(IS_NEW_FILE, false)
+            intent.putExtra(FILE_NAME, currentFile.name)
+            startActivity(intent)
         }
     }
 }
