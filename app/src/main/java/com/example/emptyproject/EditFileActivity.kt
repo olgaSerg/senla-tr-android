@@ -1,5 +1,6 @@
 package com.example.emptyproject
 
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.EditText
@@ -18,10 +19,11 @@ class EditFileActivity : AppCompatActivity() {
         editTextCreateFile = findViewById(R.id.edit_text_create_file)
         val editTextCreateFile = editTextCreateFile ?: return
 
-        val isNewFile = intent.getBooleanExtra(IS_NEW_FILE, false)
+        val isNewFile = intent.getBooleanExtra(MainActivity.IS_NEW_FILE, false)
         if (!isNewFile) {
-            fileName = intent.getStringExtra(FILE_NAME) ?: return
-            showText(editTextCreateFile, fileName!!)
+            fileName = intent.getStringExtra(MainActivity.FILE_NAME) ?: return
+            val fileName = fileName ?: return
+            showText(editTextCreateFile, fileName)
         }
     }
 
@@ -31,7 +33,7 @@ class EditFileActivity : AppCompatActivity() {
     }
 
     private fun openFile(fileName:String): String {
-        return File(applicationContext.filesDir.path, "/documents/$fileName")
+        return File(applicationContext.filesDir.path, "/${MainActivity.DIRECTORY}/$fileName")
             .bufferedReader()
             .use { it.readText(); }
     }
@@ -46,11 +48,11 @@ class EditFileActivity : AppCompatActivity() {
         var newText = editText.text.toString()
         val linesArray = newText.lines().toMutableList()
 
-        var newFileName = createFileName(linesArray)
+        val newFileName = createFileName(linesArray)
 
         newText = linesArray.joinToString(separator = "\n")
         val path = applicationContext.filesDir.absolutePath
-        val file = File(path, "/documents/${newFileName}.txt")
+        val file = File(path, "/${MainActivity.DIRECTORY}/${newFileName}.txt")
         FileOutputStream(file).use {
             it.write(newText.toByteArray())
         }
@@ -63,29 +65,30 @@ class EditFileActivity : AppCompatActivity() {
     }
 
     private fun createFileName(linesArray: MutableList<String>): String {
-        var newFileName = linesArray[0]
-        newFileName = newFileName.trim()
-        if (newFileName.isEmpty()) {
-            newFileName = getString(R.string.empty_doc_name)
+        var defaultFileName = linesArray[0]
+        defaultFileName = defaultFileName.trim()
+        if (defaultFileName.isEmpty()) {
+            defaultFileName = getString(R.string.empty_doc_name)
         }
 
         val filesSet = createFilesSet()
 
-        if (filesSet.contains("$newFileName.txt")) {
+        if (filesSet.contains("$defaultFileName.txt")) {
             var fileNumber = 1
-            while (filesSet.contains("$newFileName ($fileNumber).txt")) {
+            while (filesSet.contains("$defaultFileName ($fileNumber).txt")) {
                 fileNumber++
             }
-            newFileName = "$newFileName ($fileNumber)"
+            defaultFileName = "$defaultFileName ($fileNumber)"
         }
+        defaultFileName = Uri.encode(defaultFileName)
 
-        linesArray[0] = newFileName
+        linesArray[0] = defaultFileName
 
-        return newFileName
+        return defaultFileName
     }
 
     private fun createFilesSet(): MutableSet<String>{
-        val filesList = Utils.getDirectoryFiles(File(filesDir, "documents"))
+        val filesList = File(filesDir, MainActivity.DIRECTORY).getDirectoryFiles()
         val filesSet = mutableSetOf<String>()
         for (fileObject in filesList) {
             if (fileObject.name != fileName) {
@@ -96,7 +99,7 @@ class EditFileActivity : AppCompatActivity() {
     }
 
     private fun deleteOldFile(path: String, file: File) {
-        val oldFile = File(path, "/documents/${fileName}")
+        val oldFile = File(path, "/$MainActivity.DIRECTORY/${fileName}")
         if (file.path != oldFile.path) {
             oldFile.delete()
         }

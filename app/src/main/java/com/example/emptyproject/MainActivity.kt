@@ -8,8 +8,6 @@ import android.widget.Button
 import android.widget.ListView
 import java.io.File
 
-const val IS_NEW_FILE = "isNewFile"
-const val FILE_NAME = "fileName"
 
 class MainActivity : AppCompatActivity() {
     private var filesListView : ListView? = null
@@ -50,14 +48,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createFilesDirectory() {
-        val file = File(filesDir, "documents")
+        val file = File(filesDir, DIRECTORY)
         file.mkdir()
     }
 
     private fun getFilesList(): ArrayList<FileObject> {
-        val subDirectory = "documents"
+        val subDirectory = DIRECTORY
         val directory = File(filesDir, subDirectory)
-        return Utils.getDirectoryFiles(directory)
+        return directory.getDirectoryFiles()
     }
 
     private fun setFilesListAdapter(filesList: ArrayList<FileObject>, filesListView: ListView) {
@@ -67,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setItemClickListener(filesListView: ListView) {
         filesListView.setOnItemClickListener { listView, itemView, position, id ->
-            val currentFile: FileObject = adapter!!.getItem(position)!!
+            val currentFile: FileObject = adapter?.getItem(position) ?: return@setOnItemClickListener
             val intent = Intent(
                 this@MainActivity,
                 EditFileActivity::class.java
@@ -76,5 +74,11 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(FILE_NAME, currentFile.name)
             startActivity(intent)
         }
+    }
+
+    companion object {
+        const val IS_NEW_FILE = "isNewFile"
+        const val FILE_NAME = "fileName"
+        const val DIRECTORY = "documents"
     }
 }
