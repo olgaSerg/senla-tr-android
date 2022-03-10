@@ -1,3 +1,25 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">EmptyProject</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about_program">О программе</string>
+    <string name="about_author">Об авторе</string>
+    <string name="about_program_message">Программа состоит из двух частей: текстового редактора и калькулятора</string>
+    <string name="about_author_message">Шевчик Ольга</string>
+    <string name="exit_message">Вы действительно хотите выйти?</string>
+    <string name="ok">Ок</string>
+    <string name="cancel" tools:ignore="ButtonCase">CANCEL</string>
+
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="file_saved">Файл сохранён</string>
+    <string name="add_note">Добавить заметку</string>
+    <string name="empty_doc_name">Документ</string>
+
+    <string-array name="menu_items">
+        <item>Главная</item>
+        <item>Текстовый редактор</item>
+        <item>Калькулятор</item>
+    </string-array>
+
 </resources>
