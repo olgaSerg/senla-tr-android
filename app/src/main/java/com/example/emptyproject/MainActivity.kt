@@ -6,6 +6,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
+import androidx.core.view.isInvisible
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         val navigationView = navigationView ?: return
 
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_list_container, mainScreenFragment)
+            replace(R.id.fragment_main_screen, mainScreenFragment)
             addToBackStack(null)
             commit()
         }
@@ -54,28 +55,49 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
-
+        val listContainer = findViewById<FrameLayout>(R.id.list_container)
         // Set navigation view navigation item selected listener
         navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.main ->
                     supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragment_list_container, mainScreenFragment)
+                        if (findViewById<FrameLayout>(R.id.layout_land) != null) {
+                            hide(listFragment)
+                            hide(editFragment)
+                            show(mainScreenFragment)
+                            listContainer.isInvisible = true
+                        } else {
+
+                        }
+                        replace(R.id.fragment_main_screen, mainScreenFragment)
                         commit()
                         toolbar.title = "Мультифунк"
                     }
                 R.id.text_editor -> supportFragmentManager.beginTransaction().apply {
-                    if (findViewById<FrameLayout>(R.id.editor_layout_land) != null) {
-                        replace(R.id.fragment_list_container_land, listFragment)
-                        replace(R.id.fragment_edit_file_container, editFragment)
+                    if (findViewById<FrameLayout>(R.id.layout_land) == null) {
+                        replace(R.id.fragment_main_screen, listFragment)
                     } else {
+                        listContainer.isInvisible = false
+                        hide(mainScreenFragment)
+                        hide(calculatorFragment)
                         replace(R.id.fragment_list_container, listFragment)
+                        show(listFragment)
+                        show(editFragment)
                     }
                     commit()
                     toolbar.title = "Редактирование"
                 }
                 R.id.calculator -> supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_list_container, calculatorFragment)
+                    if (findViewById<FrameLayout>(R.id.layout_land) == null) {
+
+
+                    } else {
+                        val listContainer = findViewById<FrameLayout>(R.id.list_container)
+                        listContainer.isInvisible = true
+                        hide(listFragment)
+                        show(calculatorFragment)
+                    }
+                    replace(R.id.fragment_main_screen, calculatorFragment)
                     commit()
                     toolbar.title = "Калькулятор"
                 }
@@ -100,7 +122,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         editFileFragment.arguments = args
         if (findViewById<FrameLayout>(R.id.layout_land) == null) {
             supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_edit_file_container, editFileFragment)
+                replace(R.id.fragment_main_screen, editFileFragment)
                 if (listFragment != null) {
                     hide(listFragment)
                 }
