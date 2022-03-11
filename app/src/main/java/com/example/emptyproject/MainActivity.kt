@@ -4,16 +4,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.FrameLayout
 
-
 class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListener, EditFileFragment.OnRefreshFilesListListener {
     private var lastOpenFileName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val listFragment = ListFragment()
+
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_list_container, listFragment)
+            replace(R.id.fragment_list_container, ListFragment.newInstance())
             commit()
         }
     }

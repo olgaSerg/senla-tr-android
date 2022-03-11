@@ -15,6 +15,14 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     private var adapter: ArrayAdapter<FileObject>? = null
     private var fragmentSendDataListener: OnFragmentSendDataListener? = null
 
+    companion object {
+
+        fun newInstance() : Fragment {
+            val listFragment = ListFragment()
+            return listFragment
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         filesListView = view.findViewById(R.id.list_view)
@@ -28,6 +36,7 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         setFilesListAdapter(filesList, filesListView)
         setItemClickListener(filesListView)
     }
+
     override fun onResume() {
         super.onResume()
         filesListView ?: return
