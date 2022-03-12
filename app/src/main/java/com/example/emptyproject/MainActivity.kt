@@ -36,10 +36,11 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
 
         val toolbar = toolbar ?: return
 
+        if (savedInstanceState == null) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_main_screen, mainScreenFragment)
-            addToBackStack(null)
             commit()
+            }
         }
 
         toolbar.title = getString(R.string.main_screen_title)
@@ -82,6 +83,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
                             listContainer.isGone = true
                         }
                         replace(R.id.fragment_main_screen, mainScreenFragment)
+                        addToBackStack(null)
                         commit()
                         toolbar?.title = getString(R.string.main_screen_title)
                     }
@@ -92,6 +94,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
                         mainContainer.isGone = true
                         listContainer.isGone = false
                         replace(R.id.fragment_list_container, listFragment)
+                        addToBackStack(null)
                     }
                     commit()
                     toolbar?.title = getString(R.string.edit_title)
@@ -181,20 +184,6 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
             }
         }
     }
-
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount == 1) {
-            finish()
-            return
-        }
-        super.onBackPressed()
-    }
-
-    private val hashMapItems = hashMapOf(
-        R.id.main to "main_screen_tag",
-        R.id.text_editor to "files_list_tag",
-        R.id.calculator to "calculator_tag"
-    )
 
     companion object {
         const val IS_NEW_FILE = "isNewFile"
