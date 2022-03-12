@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.Button
 import androidx.fragment.app.Fragment
 
-
 class MainScreenFragment : Fragment(R.layout.main_screen_fragment) {
     private var buttonAboutProgram: Button? = null
     private var buttonAboutAuthor: Button? = null
