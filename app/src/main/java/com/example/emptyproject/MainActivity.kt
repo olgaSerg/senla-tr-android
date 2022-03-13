@@ -89,11 +89,11 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
                     }
                 R.id.text_editor -> supportFragmentManager.beginTransaction().apply {
                     if (findViewById<FrameLayout>(R.id.layout_land) == null) {
-                        replace(R.id.fragment_main_screen, listFragment)
+                        replace(R.id.fragment_main_screen, ListFragment.newInstance())
                     } else {
                         mainContainer.isGone = true
                         listContainer.isGone = false
-                        replace(R.id.fragment_list_container, listFragment)
+                        replace(R.id.fragment_list_container, ListFragment.newInstance())
                         addToBackStack(null)
                     }
                     commit()
@@ -112,14 +112,6 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
 
             drawerLayout.closeDrawer(GravityCompat.START)
             true
-
-
-//            val fragment = supportFragmentManager.findFragmentByTag(hashMapItems.getValue(it.itemId))
-//            supportFragmentManager.beginTransaction().apply {
-//                replace(R.id.fragment_list_container, fragment!!)
-//                commit()
-//                toolbar.title = "Главная"
-//            }
         }
     }
 

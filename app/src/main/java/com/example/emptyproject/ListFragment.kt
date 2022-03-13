@@ -15,6 +15,13 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     private var adapter: ArrayAdapter<FileObject>? = null
     private var fragmentSendDataListener: OnFragmentSendDataListener? = null
 
+    companion object {
+
+        fun newInstance(): Fragment {
+            return ListFragment()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         filesListView = view.findViewById(R.id.list_view)
