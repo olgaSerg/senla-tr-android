@@ -8,7 +8,6 @@ import android.content.Intent
 class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListener, EditFileFragment.OnRefreshFilesListListener {
     private var lastOpenFileName: String? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -16,26 +15,6 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_list_container, ListFragment.newInstance())
             commit()
-        }
-    }
-
-    private fun isLandscapeLayout() : Boolean {
-        return findViewById<FrameLayout>(R.id.layout_land) != null
-    }
-
-    private fun editFile(isNewFile: Boolean, fileName: String?) {
-        if (isLandscapeLayout()) {
-            val editFileFragment = EditFileFragment.newInstance(isNewFile, fileName)
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_edit_file_container, editFileFragment)
-                addToBackStack(null)
-                commit()
-            }
-        } else {
-            val intent = Intent(this, EditFileActivity::class.java)
-            intent.putExtra(IS_NEW_FILE, isNewFile)
-            intent.putExtra(FILE_NAME, fileName)
-            startActivity(intent);
         }
     }
 
@@ -54,15 +33,30 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
     }
 
     override fun onRefreshFilesList() {
-        val listFragment = ListFragment()
-        val fileContentFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
-        if (fileContentFragment != null) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_list_container, ListFragment.newInstance())
+            commit()
+        }
+    }
+
+    private fun editFile(isNewFile: Boolean, fileName: String?) {
+        if (isLandscapeLayout()) {
+            val editFileFragment = EditFileFragment.newInstance(isNewFile, fileName)
             supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_list_container, listFragment)
+                replace(R.id.fragment_edit_file_container, editFileFragment)
+                addToBackStack(null)
                 commit()
             }
+        } else {
+            val intent = Intent(this, EditFileActivity::class.java)
+            intent.putExtra(IS_NEW_FILE, isNewFile)
+            intent.putExtra(FILE_NAME, fileName)
+            startActivity(intent);
         }
+    }
+
+    private fun isLandscapeLayout() : Boolean {
+        return findViewById<FrameLayout>(R.id.layout_land) != null
     }
 
     companion object {
