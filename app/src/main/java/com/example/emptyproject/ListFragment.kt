@@ -17,9 +17,8 @@ class ListFragment : Fragment(R.layout.fragment_list) {
 
     companion object {
 
-        fun newInstance() : Fragment {
-            val listFragment = ListFragment()
-            return listFragment
+        fun newInstance(): Fragment {
+            return ListFragment()
         }
     }
 

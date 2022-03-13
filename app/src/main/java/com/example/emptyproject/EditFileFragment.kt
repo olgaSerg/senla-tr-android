@@ -16,12 +16,24 @@ class EditFileFragment : Fragment(R.layout.fragment_edit_file) {
     private var editTextCreateFile: EditText? = null
     private var fileName: String? = null
 
+    companion object {
+        fun newInstance(isNewFile: Boolean, fileName: String?): EditFileFragment {
+            val args = Bundle()
+            args.putBoolean(MainActivity.IS_NEW_FILE, isNewFile)
+            args.putString(MainActivity.FILE_NAME, fileName)
+
+            val editFileFragment = EditFileFragment()
+            editFileFragment.arguments = args
+            return editFileFragment
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         saveDataListener = try {
             context as OnRefreshFilesListListener
         } catch (e: ClassCastException) {
-            throw ClassCastException("$context must implement interface onSaveDataListener")
+            throw ClassCastException("$context must implement interface onRefreshFilesListListener")
         }
     }
 

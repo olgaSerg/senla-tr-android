@@ -3,9 +3,11 @@ package com.example.emptyproject
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.FrameLayout
+import android.content.Intent
 
 class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListener, EditFileFragment.OnRefreshFilesListListener {
     private var lastOpenFileName: String? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,46 +19,29 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (findViewById<FrameLayout>(R.id.layout_land) != null) return
-        val editFileFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container) ?: return
-        supportFragmentManager.beginTransaction().apply {
-            remove(editFileFragment)
-            commit()
-        }
+    private fun isLandscapeLayout() : Boolean {
+        return findViewById<FrameLayout>(R.id.layout_land) != null
     }
 
-    private fun editFile(args: Bundle) {
-        val editFileFragment = EditFileFragment()
-        val listFragment = supportFragmentManager.findFragmentById(R.id.fragment_list_container)
-        editFileFragment.arguments = args
-        if (findViewById<FrameLayout>(R.id.layout_land) == null) {
+    private fun editFile(isNewFile: Boolean, fileName: String?) {
+        if (isLandscapeLayout()) {
+            val editFileFragment = EditFileFragment.newInstance(isNewFile, fileName)
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.fragment_edit_file_container, editFileFragment)
-                if (listFragment != null) {
-                    hide(listFragment)
-                }
                 addToBackStack(null)
                 commit()
             }
         } else {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_edit_file_container, editFileFragment)
-                addToBackStack(null)
-                commit()
-            }
+            val intent = Intent(this, EditFileActivity::class.java)
+            intent.putExtra(IS_NEW_FILE, isNewFile)
+            intent.putExtra(FILE_NAME, fileName)
+            startActivity(intent);
         }
     }
 
     override fun onEditFile(fileName: String) {
         if (fileName != lastOpenFileName) {
-            val args = Bundle()
-            args.putBoolean(IS_NEW_FILE, false)
-            args.putString(FILE_NAME, fileName)
-
-            editFile(args)
+            editFile(false, fileName)
             if (findViewById<FrameLayout>(R.id.layout_land) != null) {
                 lastOpenFileName = fileName
             }
@@ -64,32 +49,18 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
     }
 
     override fun onCreateFile() {
-        val args = Bundle()
-        args.putBoolean(IS_NEW_FILE, true)
-
-        editFile(args)
+        editFile(true, null)
         lastOpenFileName = null
     }
 
     override fun onRefreshFilesList() {
         val listFragment = ListFragment()
-        val editFragment = supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
         val fileContentFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
         if (fileContentFragment != null) {
-            if (findViewById<FrameLayout>(R.id.layout_land) == null) {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_list_container, listFragment)
-                    if (editFragment != null) {
-                        hide(editFragment)
-                    }
-                    commit()
-                }
-            } else {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_list_container, listFragment)
-                    commit()
-                }
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.fragment_list_container, listFragment)
+                commit()
             }
         }
     }
