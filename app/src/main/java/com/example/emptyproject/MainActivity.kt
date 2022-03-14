@@ -1,5 +1,6 @@
 package com.example.emptyproject
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.FrameLayout
@@ -24,12 +25,8 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val mainScreenFragment = MainScreenFragment()
-        val listFragment = ListFragment()
-        val calculatorFragment = CalculatorFragment()
         listContainer = findViewById(R.id.list_container)
         mainContainer = findViewById(R.id.fragment_main_screen)
-
         drawerLayout = findViewById(R.id.drawer_layout)
         toolbar = findViewById(R.id.toolbar)
         navigationView = findViewById(R.id.navigation_view)
@@ -38,15 +35,30 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
 
         if (savedInstanceState == null) {
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_main_screen, mainScreenFragment)
+            replace(R.id.fragment_main_screen, MainScreenFragment.newInstance())
             commit()
+            }
+        }
+        else {
+            val fragment = supportFragmentManager.findFragmentById(R.id.fragment_main_screen)
+            if (isLandscapeLayout() && fragment is ListFragment) {
+                supportFragmentManager.beginTransaction().apply {
+                    mainContainer?.isGone = true
+                    listContainer?.isGone = false
+                    replace(R.id.fragment_list_container, ListFragment.newInstance())
+                    replace(R.id.fragment_main_screen, ListFragment.newInstance())
+                    commit()
+                }
+            } else {
+                mainContainer?.isGone = false
+                listContainer?.isGone = true
             }
         }
 
         toolbar.title = getString(R.string.main_screen_title)
 
         initializeActionBarDrawerToggle()
-        setNavigationDrawerListener(listFragment, calculatorFragment,mainScreenFragment)
+        setNavigationDrawerListener()
     }
 
     private fun initializeActionBarDrawerToggle() {
@@ -64,44 +76,37 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         drawerToggle.syncState()
     }
 
-    private fun setNavigationDrawerListener(
-        listFragment: ListFragment,
-        calculatorFragment: CalculatorFragment,
-        mainScreenFragment: MainScreenFragment
-    ) {
+    private fun setNavigationDrawerListener() {
         val listContainer = findViewById<LinearLayout>(R.id.list_container)
         val mainContainer = findViewById<FrameLayout>(R.id.fragment_main_screen)
         val drawerLayout = drawerLayout ?: return
         val navigationView = navigationView ?: return
         navigationView.setNavigationItemSelectedListener {
-
             when (it.itemId) {
                 R.id.main ->
                     supportFragmentManager.beginTransaction().apply {
-                        if (findViewById<FrameLayout>(R.id.layout_land) != null) {
+                        if (isLandscapeLayout()) {
                             mainContainer.isGone = false
                             listContainer.isGone = true
                         }
-                        replace(R.id.fragment_main_screen, mainScreenFragment)
-                        addToBackStack(null)
+                        replace(R.id.fragment_main_screen, MainScreenFragment.newInstance())
                         commit()
                         toolbar?.title = getString(R.string.main_screen_title)
                     }
                 R.id.text_editor -> supportFragmentManager.beginTransaction().apply {
-                    if (findViewById<FrameLayout>(R.id.layout_land) == null) {
+                    if (!isLandscapeLayout()) {
                         replace(R.id.fragment_main_screen, ListFragment.newInstance())
                     } else {
                         mainContainer.isGone = true
                         listContainer.isGone = false
                         replace(R.id.fragment_list_container, ListFragment.newInstance())
-                        addToBackStack(null)
                     }
                     commit()
                     toolbar?.title = getString(R.string.edit_title)
                 }
                 R.id.calculator -> supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_main_screen, calculatorFragment)
-                    if (findViewById<FrameLayout>(R.id.layout_land) != null) {
+                    replace(R.id.fragment_main_screen, CalculatorFragment.newInstance())
+                    if (isLandscapeLayout()) {
                         listContainer.isGone = true
                         mainContainer.isGone = false
                     }
@@ -115,31 +120,28 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         }
     }
 
-    private fun editFile(args: Bundle) {
-        val editFileFragment = EditFileFragment()
-        editFileFragment.arguments = args
-        if (findViewById<FrameLayout>(R.id.layout_land) == null) {
+    private fun editFile(isNewFile: Boolean, fileName: String?) {
+        if (isLandscapeLayout()) {
+            val editFileFragment = EditFileFragment.newInstance(isNewFile, fileName)
             supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_main_screen, editFileFragment)
-                addToBackStack(null)
+                replace(R.id.fragment_edit_file_container, editFileFragment)
                 commit()
             }
         } else {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_edit_file_container, editFileFragment)
-                addToBackStack(null)
-                commit()
-            }
+            val intent = Intent(this, EditFileActivity::class.java)
+            intent.putExtra(IS_NEW_FILE, isNewFile)
+            intent.putExtra(FILE_NAME, fileName)
+            startActivity(intent);
         }
+    }
+
+    private fun isLandscapeLayout() : Boolean {
+        return findViewById<FrameLayout>(R.id.layout_land) != null
     }
 
     override fun onEditFile(fileName: String) {
         if (fileName != lastOpenFileName) {
-            val args = Bundle()
-            args.putBoolean(IS_NEW_FILE, false)
-            args.putString(FILE_NAME, fileName)
-
-            editFile(args)
+            editFile(false, fileName)
             if (findViewById<FrameLayout>(R.id.layout_land) != null) {
                 lastOpenFileName = fileName
             }
@@ -147,32 +149,15 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
     }
 
     override fun onCreateFile() {
-        val args = Bundle()
-        args.putBoolean(IS_NEW_FILE, true)
-
-        editFile(args)
+        editFile(true, null)
         lastOpenFileName = null
     }
 
     override fun onRefreshFilesList() {
-        val listFragment = ListFragment()
-        val editFragment = supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
-        val fileContentFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
-        if (fileContentFragment != null) {
-            if (findViewById<FrameLayout>(R.id.layout_land) == null) {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_main_screen, listFragment)
-                    if (editFragment != null) {
-                        hide(editFragment)
-                    }
-                    commit()
-                }
-            } else {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_list_container, listFragment)
-                    commit()
-                }
+        if (isLandscapeLayout()) {
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.fragment_list_container, ListFragment.newInstance())
+                commit()
             }
         }
     }

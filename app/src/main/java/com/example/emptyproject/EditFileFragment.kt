@@ -33,7 +33,7 @@ class EditFileFragment : Fragment(R.layout.fragment_edit_file) {
         saveDataListener = try {
             context as OnRefreshFilesListListener
         } catch (e: ClassCastException) {
-            throw ClassCastException("$context must implement interface onSaveDataListener")
+            throw ClassCastException("$context must implement interface onRefreshFilesListListener")
         }
     }
 

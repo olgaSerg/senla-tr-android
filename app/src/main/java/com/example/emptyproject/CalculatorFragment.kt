@@ -48,6 +48,13 @@ class CalculatorFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_calculator, container, false)
     }
 
+    companion object {
+
+        fun newInstance(): Fragment {
+            return CalculatorFragment()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeFields()
@@ -76,9 +83,9 @@ class CalculatorFragment : Fragment() {
             buttonMultiplication, buttonMinus, buttonPlus, buttonEqual)
     }
 
-
-
 //    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//
 //        super.onSaveInstanceState(outState)
 //        outState.putString(NUMBER, textViewCurrentElement?.text.toString())
 //        outState.putSerializable(EXPRESSION, currentExpression)

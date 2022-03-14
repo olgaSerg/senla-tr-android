@@ -8,17 +8,23 @@ import androidx.fragment.app.DialogFragment
 class MainScreenDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        var dialog = AlertDialog.Builder(requireContext())
+            .setTitle(MainScreenFragment.TITLE)
+            .setMessage(MainScreenFragment.MESSAGE)
+            .setPositiveButton(getString(R.string.ok)) { _, _ -> }
+            .create()
+
         val args = this.arguments
         if (args != null) {
-            val title = args.getString("title")
-            val message = args.getString("message")
-            return AlertDialog.Builder(requireContext())
+            val title = args.getString(MainScreenFragment.TITLE)
+            val message = args.getString(MainScreenFragment.MESSAGE)
+            dialog = AlertDialog.Builder(requireContext())
                 .setTitle(title)
                 .setMessage(message)
                     .setPositiveButton(getString(R.string.ok)) { _, _ -> }
                     .create()
         }
-        return dialog as Dialog
+        return dialog
     }
 
 

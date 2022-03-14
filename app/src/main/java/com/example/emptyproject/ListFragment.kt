@@ -35,6 +35,7 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         setFilesListAdapter(filesList, filesListView)
         setItemClickListener(filesListView)
     }
+
     override fun onResume() {
         super.onResume()
         filesListView ?: return

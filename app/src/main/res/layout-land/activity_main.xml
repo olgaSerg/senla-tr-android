@@ -34,6 +34,7 @@
                 android:id="@+id/fragment_list_container"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:tag="files_list_container_tag"
                 android:layout_weight="1"/>
             <FrameLayout
                 android:id="@+id/fragment_edit_file_container"

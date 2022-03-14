@@ -10,6 +10,16 @@ class MainScreenFragment : Fragment(R.layout.main_screen_fragment) {
     private var buttonAboutAuthor: Button? = null
     private var buttonExit: Button? = null
 
+    companion object {
+
+        const val TITLE = "title"
+        const val MESSAGE = "message"
+
+        fun newInstance(): Fragment {
+            return MainScreenFragment()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         buttonAboutProgram = view.findViewById(R.id.button_about_program)
@@ -23,8 +33,8 @@ class MainScreenFragment : Fragment(R.layout.main_screen_fragment) {
         buttonAboutProgram.setOnClickListener {
             val dialogFragmentAboutProgram = MainScreenDialogFragment()
             val args = Bundle()
-            args.putString("title", getString(R.string.about_program))
-            args.putString("message", getString(R.string.about_program_message))
+            args.putString(TITLE, getString(R.string.about_program))
+            args.putString(MESSAGE, getString(R.string.about_program_message))
             dialogFragmentAboutProgram.arguments = args
 
             dialogFragmentAboutProgram.show(childFragmentManager, MainScreenDialogFragment.TAG)
@@ -33,8 +43,8 @@ class MainScreenFragment : Fragment(R.layout.main_screen_fragment) {
         buttonAboutAuthor.setOnClickListener {
             val dialogFragmentAboutProgram = MainScreenDialogFragment()
             val args = Bundle()
-            args.putString("title", getString(R.string.about_author))
-            args.putString("message", getString(R.string.about_author_message))
+            args.putString(TITLE, getString(R.string.about_author))
+            args.putString(MESSAGE, getString(R.string.about_author_message))
             dialogFragmentAboutProgram.arguments = args
 
             dialogFragmentAboutProgram.show(childFragmentManager, MainScreenDialogFragment.TAG)
@@ -43,7 +53,7 @@ class MainScreenFragment : Fragment(R.layout.main_screen_fragment) {
         buttonExit.setOnClickListener {
             val exitDialogFragment = ExitDialogFragment()
             val args = Bundle()
-            args.putString("message", getString(R.string.exit_message))
+            args.putString(MESSAGE, getString(R.string.exit_message))
             exitDialogFragment.arguments = args
 
             exitDialogFragment.show(childFragmentManager, ExitDialogFragment.TAG)
