@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
             val intent = Intent(this, EditFileActivity::class.java)
             intent.putExtra(IS_NEW_FILE, isNewFile)
             intent.putExtra(FILE_NAME, fileName)
-            startActivity(intent);
+            startActivity(intent)
         }
     }
 
