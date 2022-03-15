@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
     private var navigationView: NavigationView? = null
     private var listContainer : LinearLayout? = null
     private var mainContainer : FrameLayout? = null
+    private var stateFragment: SelectionStateFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,34 +32,82 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         toolbar = findViewById(R.id.toolbar)
         navigationView = findViewById(R.id.navigation_view)
 
-        val toolbar = toolbar ?: return
-
-        if (savedInstanceState == null) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_main_screen, MainScreenFragment.newInstance())
-            commit()
-            }
-        }
-        else {
-            val fragment = supportFragmentManager.findFragmentById(R.id.fragment_main_screen)
-            if (isLandscapeLayout() && fragment is ListFragment) {
-                supportFragmentManager.beginTransaction().apply {
-                    mainContainer?.isGone = true
-                    listContainer?.isGone = false
-                    replace(R.id.fragment_list_container, ListFragment.newInstance())
-                    replace(R.id.fragment_main_screen, ListFragment.newInstance())
-                    commit()
-                }
-            } else {
-                mainContainer?.isGone = false
-                listContainer?.isGone = true
-            }
-        }
-
-        toolbar.title = getString(R.string.main_screen_title)
-
+        initializeStateFragment()
         initializeActionBarDrawerToggle()
         setNavigationDrawerListener()
+    }
+
+    private fun initializeStateFragment() {
+        val selectionStateFragment = supportFragmentManager.findFragmentByTag("headless")
+        if (selectionStateFragment == null) {
+            stateFragment = SelectionStateFragment()
+
+            val stateFragment = stateFragment ?: return
+            supportFragmentManager.beginTransaction().add(stateFragment, "headless").commit()
+        } else {
+            stateFragment = selectionStateFragment as SelectionStateFragment
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        restoreState()
+    }
+
+    private fun handleNavigationItemSelected(itemId: Int) {
+        val listContainer = findViewById<LinearLayout>(R.id.list_container)
+        val mainContainer = findViewById<FrameLayout>(R.id.fragment_main_screen)
+        val drawerLayout = drawerLayout ?: return
+        val stateFragment = stateFragment ?: return
+        when (itemId) {
+            R.id.main ->
+                supportFragmentManager.beginTransaction().apply {
+                    if (isLandscapeLayout()) {
+                        mainContainer.isGone = false
+                        listContainer.isGone = true
+                    }
+                    replace(R.id.fragment_main_screen, MainScreenFragment.newInstance())
+                    supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
+                        ?.let { remove(it) }
+                    commit()
+                    toolbar?.title = getString(R.string.main_screen_title)
+                    stateFragment.lastSelection = State.MAIN
+                }
+            R.id.text_editor -> supportFragmentManager.beginTransaction().apply {
+                if (!isLandscapeLayout()) {
+                    replace(R.id.fragment_main_screen, ListFragment.newInstance())
+                } else {
+                    mainContainer.isGone = true
+                    listContainer.isGone = false
+                    replace(R.id.fragment_list_container, ListFragment.newInstance())
+                }
+                commit()
+                toolbar?.title = getString(R.string.edit_title)
+                stateFragment.lastSelection = State.TEXT_EDITOR
+            }
+            R.id.calculator -> supportFragmentManager.beginTransaction().apply {
+                replace(R.id.fragment_main_screen, CalculatorFragment.newInstance())
+                if (isLandscapeLayout()) {
+                    mainContainer.isGone = false
+                    listContainer.isGone = true
+                }
+                supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
+                    ?.let { remove(it) }
+                commit()
+                toolbar?.title = getString(R.string.calculator_title)
+                stateFragment.lastSelection = State.CALCULATOR
+            }
+        }
+        drawerLayout.closeDrawer(GravityCompat.START)
+    }
+
+    private fun restoreState() {
+        val stateFragment = stateFragment ?: return
+        when (stateFragment.lastSelection) {
+            State.MAIN -> handleNavigationItemSelected(R.id.main)
+            State.TEXT_EDITOR -> handleNavigationItemSelected(R.id.text_editor)
+            State.CALCULATOR -> handleNavigationItemSelected(R.id.calculator)
+        }
     }
 
     private fun initializeActionBarDrawerToggle() {
@@ -77,45 +126,9 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
     }
 
     private fun setNavigationDrawerListener() {
-        val listContainer = findViewById<LinearLayout>(R.id.list_container)
-        val mainContainer = findViewById<FrameLayout>(R.id.fragment_main_screen)
-        val drawerLayout = drawerLayout ?: return
         val navigationView = navigationView ?: return
         navigationView.setNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.main ->
-                    supportFragmentManager.beginTransaction().apply {
-                        if (isLandscapeLayout()) {
-                            mainContainer.isGone = false
-                            listContainer.isGone = true
-                        }
-                        replace(R.id.fragment_main_screen, MainScreenFragment.newInstance())
-                        commit()
-                        toolbar?.title = getString(R.string.main_screen_title)
-                    }
-                R.id.text_editor -> supportFragmentManager.beginTransaction().apply {
-                    if (!isLandscapeLayout()) {
-                        replace(R.id.fragment_main_screen, ListFragment.newInstance())
-                    } else {
-                        mainContainer.isGone = true
-                        listContainer.isGone = false
-                        replace(R.id.fragment_list_container, ListFragment.newInstance())
-                    }
-                    commit()
-                    toolbar?.title = getString(R.string.edit_title)
-                }
-                R.id.calculator -> supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_main_screen, CalculatorFragment.newInstance())
-                    if (isLandscapeLayout()) {
-                        listContainer.isGone = true
-                        mainContainer.isGone = false
-                    }
-                    commit()
-                    toolbar?.title = getString(R.string.calculator_title)
-                }
-            }
-
-            drawerLayout.closeDrawer(GravityCompat.START)
+            handleNavigationItemSelected(it.itemId)
             true
         }
     }
@@ -131,7 +144,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
             val intent = Intent(this, EditFileActivity::class.java)
             intent.putExtra(IS_NEW_FILE, isNewFile)
             intent.putExtra(FILE_NAME, fileName)
-            startActivity(intent);
+            startActivity(intent)
         }
     }
 

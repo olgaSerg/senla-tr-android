@@ -21,14 +21,22 @@ class MainScreenDialogFragment : DialogFragment() {
             dialog = AlertDialog.Builder(requireContext())
                 .setTitle(title)
                 .setMessage(message)
-                    .setPositiveButton(getString(R.string.ok)) { _, _ -> }
-                    .create()
+                .setPositiveButton(getString(R.string.ok)) { _, _ -> }
+                .create()
         }
         return dialog
     }
 
-
     companion object {
         const val TAG = "MainScreenDialogFragment"
+
+        fun newInstance(title: String, message: String): MainScreenDialogFragment {
+            val dialogFragment = MainScreenDialogFragment()
+            val args = Bundle()
+            args.putString(MainScreenFragment.TITLE, title)
+            args.putString(MainScreenFragment.MESSAGE, message)
+            dialogFragment.arguments = args
+            return dialogFragment
+        }
     }
 }

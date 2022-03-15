@@ -31,21 +31,15 @@ class MainScreenFragment : Fragment(R.layout.main_screen_fragment) {
         val  buttonExit =  buttonExit ?: return
 
         buttonAboutProgram.setOnClickListener {
-            val dialogFragmentAboutProgram = MainScreenDialogFragment()
-            val args = Bundle()
-            args.putString(TITLE, getString(R.string.about_program))
-            args.putString(MESSAGE, getString(R.string.about_program_message))
-            dialogFragmentAboutProgram.arguments = args
+            val dialogFragmentAboutProgram = MainScreenDialogFragment.newInstance(getString(R.string.about_program),
+                getString(R.string.about_program_message))
 
             dialogFragmentAboutProgram.show(childFragmentManager, MainScreenDialogFragment.TAG)
         }
 
         buttonAboutAuthor.setOnClickListener {
-            val dialogFragmentAboutProgram = MainScreenDialogFragment()
-            val args = Bundle()
-            args.putString(TITLE, getString(R.string.about_author))
-            args.putString(MESSAGE, getString(R.string.about_author_message))
-            dialogFragmentAboutProgram.arguments = args
+            val dialogFragmentAboutProgram = MainScreenDialogFragment.newInstance(getString(R.string.about_author),
+                getString(R.string.about_author_message))
 
             dialogFragmentAboutProgram.show(childFragmentManager, MainScreenDialogFragment.TAG)
         }
