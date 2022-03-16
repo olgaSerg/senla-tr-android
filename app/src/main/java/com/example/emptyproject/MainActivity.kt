@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
     private var navigationView: NavigationView? = null
     private var listContainer : LinearLayout? = null
     private var mainContainer : FrameLayout? = null
-    private var stateFragment: SelectionStateFragment? = null
+    private var state = MAIN
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,21 +32,13 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         toolbar = findViewById(R.id.toolbar)
         navigationView = findViewById(R.id.navigation_view)
 
-        initializeStateFragment()
         initializeActionBarDrawerToggle()
         setNavigationDrawerListener()
     }
 
-    private fun initializeStateFragment() {
-        val selectionStateFragment = supportFragmentManager.findFragmentByTag("headless")
-        if (selectionStateFragment == null) {
-            stateFragment = SelectionStateFragment()
-
-            val stateFragment = stateFragment ?: return
-            supportFragmentManager.beginTransaction().add(stateFragment, "headless").commit()
-        } else {
-            stateFragment = selectionStateFragment as SelectionStateFragment
-        }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        state = savedInstanceState.getString(STATE).toString()
     }
 
     override fun onResume() {
@@ -54,11 +46,15 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         restoreState()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE, state)
+    }
+
     private fun handleNavigationItemSelected(itemId: Int) {
         val listContainer = findViewById<LinearLayout>(R.id.list_container)
         val mainContainer = findViewById<FrameLayout>(R.id.fragment_main_screen)
         val drawerLayout = drawerLayout ?: return
-        val stateFragment = stateFragment ?: return
         when (itemId) {
             R.id.main ->
                 supportFragmentManager.beginTransaction().apply {
@@ -71,7 +67,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
                         ?.let { remove(it) }
                     commit()
                     toolbar?.title = getString(R.string.main_screen_title)
-                    stateFragment.lastSelection = State.MAIN
+                    state = MAIN
                 }
             R.id.text_editor -> supportFragmentManager.beginTransaction().apply {
                 if (!isLandscapeLayout()) {
@@ -83,7 +79,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
                 }
                 commit()
                 toolbar?.title = getString(R.string.edit_title)
-                stateFragment.lastSelection = State.TEXT_EDITOR
+                state = TEXT_EDITOR
             }
             R.id.calculator -> supportFragmentManager.beginTransaction().apply {
                 replace(R.id.fragment_main_screen, CalculatorFragment.newInstance())
@@ -95,18 +91,17 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
                     ?.let { remove(it) }
                 commit()
                 toolbar?.title = getString(R.string.calculator_title)
-                stateFragment.lastSelection = State.CALCULATOR
+                state = CALCULATOR
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START)
     }
 
     private fun restoreState() {
-        val stateFragment = stateFragment ?: return
-        when (stateFragment.lastSelection) {
-            State.MAIN -> handleNavigationItemSelected(R.id.main)
-            State.TEXT_EDITOR -> handleNavigationItemSelected(R.id.text_editor)
-            State.CALCULATOR -> handleNavigationItemSelected(R.id.calculator)
+        when (state) {
+            MAIN -> handleNavigationItemSelected(R.id.main)
+            TEXT_EDITOR-> handleNavigationItemSelected(R.id.text_editor)
+            CALCULATOR -> handleNavigationItemSelected(R.id.calculator)
         }
     }
 
@@ -179,5 +174,9 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
         const val IS_NEW_FILE = "isNewFile"
         const val FILE_NAME = "fileName"
         const val DIRECTORY = "documents"
+        const val MAIN = "main"
+        const val TEXT_EDITOR = "text_editor"
+        const val CALCULATOR = "calculator"
+        const val STATE = "state"
     }
 }
