@@ -8,10 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 
-private const val NUMBER = "number"
-private const val EXPRESSION = "expression"
-private const val IS_CALCULATION_FINISHED = "isCalculationFinished"
-
 class CalculatorFragment : Fragment() {
 
     private var textViewCurrentElement: TextView? = null
@@ -44,7 +40,6 @@ class CalculatorFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_calculator, container, false)
     }
 
@@ -82,31 +77,6 @@ class CalculatorFragment : Fragment() {
             buttonSeven, buttonEight, buttonNine, buttonDivision,
             buttonMultiplication, buttonMinus, buttonPlus, buttonEqual)
     }
-
-//    override fun onSaveInstanceState(outState: Bundle) {
-//        super.onSaveInstanceState(outState)
-//
-//        super.onSaveInstanceState(outState)
-//        outState.putString(NUMBER, textViewCurrentElement?.text.toString())
-//        outState.putSerializable(EXPRESSION, currentExpression)
-//        outState.putBoolean(IS_CALCULATION_FINISHED, isCalculationFinished)
-//    }
-//
-//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-//        super.onRestoreInstanceState(savedInstanceState)
-//        val number = savedInstanceState.getString(NUMBER)
-//        val expression = savedInstanceState.getSerializable(EXPRESSION) as ArrayList<String>
-//        val isFinished = savedInstanceState.getBoolean(IS_CALCULATION_FINISHED)
-//
-//        number ?: return
-//
-//        setCurrentNumberText(number)
-//
-//        currentExpression = expression
-//        displayExpression()
-//
-//        isCalculationFinished = isFinished
-//    }
 
     private fun initializeFields() {
         textViewCurrentElement = view?.findViewById(R.id.text_view_current_element)

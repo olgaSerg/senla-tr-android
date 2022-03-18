@@ -20,13 +20,8 @@ class EditFileActivity : AppCompatActivity(), EditFileFragment.OnRefreshFilesLis
 
         setContentView(R.layout.activity_edit_file)
 
-        toolbar = findViewById(R.id.toolbar_edit_file)
-        val toolbar = toolbar ?: return
-
-        toolbar.title = getString(R.string.edit_title)
-
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setToolbar()
+        getIntentFromListFragment()
 
         val fileName = intent.getStringExtra(MainActivity.FILE_NAME)
         val isNewFile = intent.getBooleanExtra(MainActivity.IS_NEW_FILE, false)
@@ -36,6 +31,20 @@ class EditFileActivity : AppCompatActivity(), EditFileFragment.OnRefreshFilesLis
             replace(R.id.fragment_edit_file_container, editFileFragment)
             commit()
         }
+    }
+
+    private fun setToolbar() {
+        toolbar = findViewById(R.id.toolbar_edit_file)
+        val toolbar = toolbar ?: return
+
+        toolbar.title = getString(R.string.edit_title)
+
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun getIntentFromListFragment() {
+
     }
 
     override fun onRefreshFilesList() {
