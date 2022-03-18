@@ -22,6 +22,11 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         }
     }
 
+    interface OnFragmentSendDataListener {
+        fun onEditFile(fileName: String)
+        fun onCreateFile()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         filesListView = view.findViewById(R.id.list_view)
@@ -51,11 +56,6 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         buttonCreate.setOnClickListener {
             fragmentSendDataListener.onCreateFile()
         }
-    }
-
-    interface OnFragmentSendDataListener {
-        fun onEditFile(fileName: String)
-        fun onCreateFile()
     }
 
     override fun onAttach(context: Context) {

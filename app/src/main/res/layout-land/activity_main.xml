@@ -22,7 +22,7 @@
         <FrameLayout
             android:id="@+id/fragment_main_screen"
             android:layout_width="match_parent"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="?attr/actionBarSize"
             android:layout_height="match_parent" />
         <LinearLayout
             android:layout_width="match_parent"

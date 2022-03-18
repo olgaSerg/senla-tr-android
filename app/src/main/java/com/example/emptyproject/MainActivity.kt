@@ -70,13 +70,16 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
                     state = MAIN
                 }
             R.id.text_editor -> supportFragmentManager.beginTransaction().apply {
-                if (!isLandscapeLayout()) {
-                    replace(R.id.fragment_main_screen, ListFragment.newInstance())
+                val containerId = if (!isLandscapeLayout()) {
+                    R.id.fragment_main_screen
                 } else {
+                    R.id.fragment_list_container
+                }
+                if (isLandscapeLayout()) {
                     mainContainer.isGone = true
                     listContainer.isGone = false
-                    replace(R.id.fragment_list_container, ListFragment.newInstance())
                 }
+                openListFragment(containerId)
                 commit()
                 toolbar?.title = getString(R.string.edit_title)
                 state = TEXT_EDITOR
@@ -163,13 +166,16 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
 
     override fun onRefreshFilesList() {
         if (isLandscapeLayout()) {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_list_container, ListFragment.newInstance())
-                commit()
-            }
+           openListFragment(R.id.fragment_list_container)
         }
     }
 
+    private fun openListFragment(containerId: Int) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(containerId, ListFragment.newInstance())
+            commit()
+        }
+    }
     companion object {
         const val IS_NEW_FILE = "isNewFile"
         const val FILE_NAME = "fileName"
