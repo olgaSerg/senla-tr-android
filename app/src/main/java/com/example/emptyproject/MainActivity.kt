@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
         val fragment = supportFragmentManager.findFragmentById(R.id.main_fragment_container) as ElementsFragment
             fragment.elements.add(Element("", 0))
-            fragment.recyclerView!!.adapter!!.notifyDataSetChanged()
+            fragment.recyclerView?.adapter?.notifyDataSetChanged()
         }
     }
 

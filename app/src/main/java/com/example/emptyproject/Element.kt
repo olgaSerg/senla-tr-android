@@ -14,12 +14,14 @@ data class Element(var name: String = "", var value: Int = 0) : Externalizable, 
     )
 
     override fun writeExternal(out: ObjectOutput?) {
-        out!!.writeUTF(name)
+        if (out == null) return
+        out.writeUTF(name)
         out.writeInt(value)
     }
 
     override fun readExternal(input: ObjectInput?) {
-        name = input!!.readUTF()
+        if (input == null) return
+        name = input.readUTF()
         value = input.readInt()
     }
 

@@ -53,7 +53,7 @@ class ElementsFragment : Fragment(R.layout.elements_fragment) {
             val element: Element = oin.readObject() as Element
             elements.add(element)
         }
-        recyclerView!!.adapter!!.notifyDataSetChanged()
+        recyclerView?.adapter?.notifyDataSetChanged()
     }
 
     override fun onDestroyView() {
