@@ -27,7 +27,7 @@ class ElementsFragment : Fragment(R.layout.elements_fragment) {
         super.onViewCreated(view, savedInstanceState)
 
         if (savedInstanceState == null) {
-            loadElementsFromFile()
+            elements = loadElementsFromFile() as ArrayList<Element>
         } else {
             elements = savedInstanceState.getParcelableArrayList<Element>(LIST) as ArrayList<Element>
         }
@@ -44,16 +44,16 @@ class ElementsFragment : Fragment(R.layout.elements_fragment) {
         outState.putParcelableArrayList(LIST, elements)
     }
 
-    private fun loadElementsFromFile() {
-        if (!File(requireActivity().filesDir.path + "/temp.out").exists()) return
+    private fun loadElementsFromFile(): List<Element> {
+        val elements = mutableListOf<Element>()
+        if (!File(requireActivity().filesDir.path + "/temp.out").exists()) return elements
         val fis = FileInputStream(requireActivity().filesDir.path + "/temp.out")
         val oin = ObjectInputStream(fis)
-        elements.clear()
         while (fis.available() > 0) {
             val element: Element = oin.readObject() as Element
             elements.add(element)
         }
-        recyclerView?.adapter?.notifyDataSetChanged()
+        return elements
     }
 
     override fun onDestroyView() {

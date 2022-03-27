@@ -17,8 +17,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        buttonAdd = findViewById(R.id.add)
-        buttonSave = findViewById(R.id.save)
+        buttonAdd = findViewById(R.id.menu_button_add)
+        buttonSave = findViewById(R.id.menu_button_save)
 
         val buttonAdd = buttonAdd ?: return
         val buttonSave = buttonSave ?: return
@@ -36,7 +36,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setAddButtonListener(button: ActionMenuItemView) {
         button.setOnClickListener {
-        val fragment = supportFragmentManager.findFragmentById(R.id.main_fragment_container) as ElementsFragment
+            val fragment =
+                supportFragmentManager.findFragmentById(R.id.main_fragment_container) as? ElementsFragment
+                    ?: return@setOnClickListener
             fragment.elements.add(Element("", 0))
             fragment.recyclerView?.adapter?.notifyDataSetChanged()
         }

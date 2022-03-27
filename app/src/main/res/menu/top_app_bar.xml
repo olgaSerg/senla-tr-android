@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/save"
+        android:id="@+id/menu_button_save"
         android:icon="@drawable/ic_baseline_save_30"
         app:showAsAction="ifRoom"
         android:title="@string/save" />
 
     <item
-        android:id="@+id/add"
+        android:id="@+id/menu_button_add"
         android:icon="@drawable/ic_baseline_add_circle_30"
         app:showAsAction="ifRoom"
         android:title="@string/add" />
