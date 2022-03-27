@@ -16,6 +16,10 @@ class EditFileFragment : Fragment(R.layout.fragment_edit_file) {
     private var editTextCreateFile: EditText? = null
     private var fileName: String? = null
 
+    interface OnRefreshFilesListListener {
+        fun onRefreshFilesList()
+    }
+
     companion object {
         fun newInstance(isNewFile: Boolean, fileName: String?): EditFileFragment {
             val args = Bundle()
@@ -53,10 +57,6 @@ class EditFileFragment : Fragment(R.layout.fragment_edit_file) {
         editTextCreateFile?.let { saveFile(it) }
 
         saveDataListener?.onRefreshFilesList()
-    }
-
-    interface OnRefreshFilesListListener {
-        fun onRefreshFilesList()
     }
 
     private fun openFile(fileName: String): String {

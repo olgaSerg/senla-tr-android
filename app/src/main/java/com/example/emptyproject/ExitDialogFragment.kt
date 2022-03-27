@@ -26,7 +26,6 @@ class ExitDialogFragment : DialogFragment() {
         return dialog
     }
 
-
     companion object {
         const val TAG = "ExitScreenDialogFragment"
     }

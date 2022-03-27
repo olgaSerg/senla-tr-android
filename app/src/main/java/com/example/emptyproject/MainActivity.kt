@@ -1,6 +1,7 @@
 package com.example.emptyproject
 
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.FrameLayout
@@ -52,52 +53,64 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
     }
 
     private fun handleNavigationItemSelected(itemId: Int) {
-        val listContainer = findViewById<LinearLayout>(R.id.list_container)
-        val mainContainer = findViewById<FrameLayout>(R.id.fragment_main_screen)
         val drawerLayout = drawerLayout ?: return
         when (itemId) {
-            R.id.main ->
-                supportFragmentManager.beginTransaction().apply {
-                    if (isLandscapeLayout()) {
-                        mainContainer.isGone = false
-                        listContainer.isGone = true
-                    }
-                    replace(R.id.fragment_main_screen, MainScreenFragment.newInstance())
-                    supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
-                        ?.let { remove(it) }
-                    commit()
-                    toolbar?.title = getString(R.string.main_screen_title)
-                    state = MAIN
-                }
-            R.id.text_editor -> supportFragmentManager.beginTransaction().apply {
-                val containerId = if (!isLandscapeLayout()) {
-                    R.id.fragment_main_screen
-                } else {
-                    R.id.fragment_list_container
-                }
-                if (isLandscapeLayout()) {
-                    mainContainer.isGone = true
-                    listContainer.isGone = false
-                }
-                openListFragment(containerId)
-                commit()
-                toolbar?.title = getString(R.string.edit_title)
-                state = TEXT_EDITOR
-            }
-            R.id.calculator -> supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_main_screen, CalculatorFragment.newInstance())
-                if (isLandscapeLayout()) {
-                    mainContainer.isGone = false
-                    listContainer.isGone = true
-                }
-                supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
-                    ?.let { remove(it) }
-                commit()
-                toolbar?.title = getString(R.string.calculator_title)
-                state = CALCULATOR
-            }
+            R.id.main -> handleMainItemSelected()
+            R.id.text_editor -> handleEditorItemSelected()
+            R.id.calculator -> handleCalculatorItemSelected()
         }
         drawerLayout.closeDrawer(GravityCompat.START)
+    }
+
+    private fun handleMainItemSelected() {
+        if (mainContainer == null && listContainer == null) return
+        supportFragmentManager.beginTransaction().apply {
+            if (isLandscapeLayout()) {
+                mainContainer?.isGone = false
+                listContainer?.isGone = true
+            }
+            replace(R.id.fragment_main_screen, MainScreenFragment.newInstance())
+            supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
+                ?.let { remove(it) }
+            commit()
+            toolbar?.title = getString(R.string.main_screen_title)
+            state = MAIN
+        }
+    }
+
+    private fun handleEditorItemSelected() {
+        if (mainContainer == null && listContainer == null) return
+        supportFragmentManager.beginTransaction().apply {
+            val containerId = if (!isLandscapeLayout()) {
+                R.id.fragment_main_screen
+            } else {
+                R.id.fragment_list_container
+            }
+            if (isLandscapeLayout()) {
+                mainContainer?.isGone = true
+                listContainer?.isGone = false
+            }
+            openListFragment(containerId)
+            commit()
+            toolbar?.title = getString(R.string.edit_title)
+            state = TEXT_EDITOR
+        }
+    }
+
+    private fun handleCalculatorItemSelected() {
+        if (mainContainer == null && listContainer == null) return
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_main_screen, CalculatorFragment.newInstance())
+            if (isLandscapeLayout()) {
+                mainContainer?.isGone = false
+                listContainer?.isGone = true
+            }
+            supportFragmentManager.findFragmentById(R.id.fragment_edit_file_container)
+                ?.let { remove(it) }
+            commit()
+            toolbar?.title = getString(R.string.calculator_title)
+            state = CALCULATOR
+        }
     }
 
     private fun restoreState() {
@@ -147,7 +160,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentSendDataListene
     }
 
     private fun isLandscapeLayout() : Boolean {
-        return findViewById<FrameLayout>(R.id.layout_land) != null
+        return resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     }
 
     override fun onEditFile(fileName: String) {

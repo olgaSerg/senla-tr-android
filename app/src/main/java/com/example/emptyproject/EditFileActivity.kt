@@ -1,8 +1,6 @@
 package com.example.emptyproject
 
-import android.content.res.Configuration
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
@@ -17,7 +15,6 @@ class EditFileActivity : AppCompatActivity(), EditFileFragment.OnRefreshFilesLis
 
         setToolbar()
         loadEditFileFragment()
-
     }
 
     private fun setToolbar() {
