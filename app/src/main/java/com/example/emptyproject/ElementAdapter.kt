@@ -33,24 +33,35 @@ class ElementAdapter(private val elements: ArrayList<Element>) : RecyclerView.Ad
     }
 
     override fun onBindViewHolder(holder: ElementViewHolder, position: Int) {
-        holder.textViewValue.text = elements[position].value.toString()
+        holder.textViewValue.text = elements[holder.adapterPosition].value.toString()
         holder.imageButtonDelete.setOnClickListener {
-            elements.removeAt(position)
-            notifyDataSetChanged()
+            removeItem(holder.adapterPosition)
         }
         holder.imageButtonDecrease.setOnClickListener {
-            if (elements[position].value == 0) return@setOnClickListener
-            elements[position].value--
-            notifyItemChanged(position)
+            if (elements[holder.adapterPosition].value == 0) return@setOnClickListener
+            decreaseQuantity(holder.adapterPosition)
         }
         holder.imageButtonIncrease.setOnClickListener {
-            elements[position].value++
-            notifyItemChanged(position)
+            increaseQuantity(holder.adapterPosition)
         }
-        holder.editTextItem.setText(elements[position].name)
+        holder.editTextItem.setText(elements[holder.adapterPosition].name)
     }
 
     override fun getItemCount(): Int {
         return elements.size
+    }
+
+    private fun removeItem(position: Int) {
+        elements.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    private fun increaseQuantity(position: Int) {
+        elements[position].value++
+        notifyItemChanged(position)
+    }
+    private fun decreaseQuantity(position: Int) {
+        elements[position].value--
+        notifyItemChanged(position)
     }
 }
