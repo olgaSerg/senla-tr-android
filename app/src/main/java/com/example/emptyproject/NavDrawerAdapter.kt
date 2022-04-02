@@ -47,9 +47,9 @@ class NavDrawerAdapter(
 
         val itemColor = context.resources.getColor(
             if (selectedItem == position)
-                R.color.color_purple
+                R.color.color_checked_item
             else
-                R.color.color_white
+                R.color.color_unchecked_item
         )
 
         holder.itemView.setBackgroundColor(itemColor)
