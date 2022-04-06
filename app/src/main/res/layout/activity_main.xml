@@ -22,7 +22,7 @@
             android:id="@+id/text_view_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="48sp"
+            android:textSize="@dimen/main_screen_text_size"
             android:layout_marginStart="10dp" />
     </ScrollView>
 
