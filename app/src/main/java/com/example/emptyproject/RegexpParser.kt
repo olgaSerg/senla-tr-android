@@ -39,7 +39,7 @@ class RegexpParser {
     }
 
     private fun uppercaseFourLetterWord(str: String): String {
-        val regexp = """\b[А-Яа-я]{4}\b"""
+        val regexp = """\b([А-Яа-я]|[A-Za-z]){4}\b"""
         val result = str.replace(regexp.toRegex()) { m -> m.groupValues[0].uppercase() }
 
         return result

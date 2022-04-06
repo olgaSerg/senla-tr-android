@@ -1,16 +1,15 @@
 package com.example.emptyproject
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class NavDrawerAdapter(
 
-    private var context: Context,
     private val itemsNavigation: ArrayList<NavDrawerItem>,
     private var clickNavigationDrawerMenu: OnClickNavigationDrawerMenu? = null,
 ) :
@@ -18,9 +17,24 @@ class NavDrawerAdapter(
 
     private var selectedItem = 0
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textViewNavigation: TextView = itemView.findViewById(R.id.text_view_navigation)
-        val imageViewNavigation: ImageView = itemView.findViewById(R.id.image_view_navigation)
+    inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val itemViewNavigation: LinearLayout = itemView.findViewById(R.id.item_view)
+        private val textViewNavigation: TextView = itemView.findViewById(R.id.text_view_navigation)
+        private val imageViewNavigation = itemView.findViewById<ImageView>(R.id.image_view_navigation)
+
+        fun bind (holder: ItemViewHolder, selectedItem: Int) {
+            holder.textViewNavigation.text = itemsNavigation[adapterPosition].name
+            holder.imageViewNavigation.setImageResource(itemsNavigation[adapterPosition].image)
+
+//            val itemColor = holder.itemViewNavigation.context.resources.getColor(
+//                if (selectedItem == adapterPosition)
+//                    R.color.color_checked_item
+//                else
+//                    R.color.color_unchecked_item
+//            )
+
+//            holder.itemView.setBackgroundColor(itemColor)
+        }
     }
 
     interface OnClickNavigationDrawerMenu {
@@ -33,31 +47,21 @@ class NavDrawerAdapter(
                 .inflate(R.layout.navigation_drawer_item, parent, false)
 
         clickNavigationDrawerMenu = try {
-            context as OnClickNavigationDrawerMenu
+            parent.context as OnClickNavigationDrawerMenu
         } catch (e: ClassCastException) {
-            throw ClassCastException("$context must implement interface OnClickNavigationDrawerMenu")
+            throw ClassCastException("${parent.context} must implement interface OnClickNavigationDrawerMenu")
         }
-
         return ItemViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.textViewNavigation.text = itemsNavigation[position].name
-        holder.imageViewNavigation.setImageResource(itemsNavigation[position].image)
-
-        val itemColor = context.resources.getColor(
-            if (selectedItem == position)
-                R.color.color_checked_item
-            else
-                R.color.color_unchecked_item
-        )
-
-        holder.itemView.setBackgroundColor(itemColor)
-        setTextViewNavigationOnClickListener(holder)
+        selectedItem = holder.adapterPosition
+        holder.bind(holder, selectedItem)
+        setItemViewNavigationOnClickListener(holder)
     }
 
-    private fun setTextViewNavigationOnClickListener(holder: ItemViewHolder) {
-        holder.textViewNavigation.setOnClickListener {
+    private fun setItemViewNavigationOnClickListener(holder: ItemViewHolder) {
+        holder.itemViewNavigation.setOnClickListener {
             val clickNavigationDrawerMenu = clickNavigationDrawerMenu ?: return@setOnClickListener
 
             val previousItem = selectedItem

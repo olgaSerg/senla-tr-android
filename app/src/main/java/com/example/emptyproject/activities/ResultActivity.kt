@@ -1,9 +1,10 @@
-package com.example.emptyproject
+package com.example.emptyproject.activities
 
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.example.emptyproject.R
 
 class ResultActivity : AppCompatActivity() {
 
@@ -24,6 +25,7 @@ class ResultActivity : AppCompatActivity() {
         textView.text = intent.getStringExtra(RESULT)
 
         setToolbar()
+
     }
 
     private fun setToolbar() {
@@ -40,4 +42,5 @@ class ResultActivity : AppCompatActivity() {
         onBackPressed()
         return true
     }
+
 }

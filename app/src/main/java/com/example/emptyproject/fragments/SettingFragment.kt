@@ -1,10 +1,12 @@
-package com.example.emptyproject
+package com.example.emptyproject.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.RadioGroup
 import android.widget.RadioButton
+import com.example.emptyproject.R
+import com.example.emptyproject.SharedPreferencesManager
 
 class SettingFragment : Fragment(R.layout.fragment_settings) {
 

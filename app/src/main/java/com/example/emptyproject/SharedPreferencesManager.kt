@@ -10,10 +10,7 @@ class SharedPreferencesManager(context: Activity) {
         const val CHECKED_RADIO_BUTTON = "checked_button"
     }
 
-    private var sharedPreferences: SharedPreferences = context.getSharedPreferences(
-        SETTINGS,
-        Context.MODE_PRIVATE
-    )
+    private val sharedPreferences by lazy { context.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE) }
 
     fun savePreferences(checkedRadioButton: String) {
         val e: SharedPreferences.Editor = sharedPreferences.edit()

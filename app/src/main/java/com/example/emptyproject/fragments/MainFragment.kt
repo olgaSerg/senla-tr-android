@@ -1,4 +1,4 @@
-package com.example.emptyproject
+package com.example.emptyproject.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -6,6 +6,9 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import com.example.emptyproject.R
+import com.example.emptyproject.RegexpParser
+import com.example.emptyproject.SharedPreferencesManager
 
 class MainFragment : Fragment(R.layout.fragment_main) {
 
@@ -41,13 +44,13 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         buttonResult = view.findViewById(R.id.button_result)
 
         val buttonResult = buttonResult ?: return
+        val editText = editText ?: return
 
         regexpMode = SharedPreferencesManager(requireActivity()).loadPreferencesSelectedRadioButton()
-        setButtonResultClickListener(buttonResult)
+        setButtonResultClickListener(buttonResult, editText)
     }
 
-    private fun setButtonResultClickListener(buttonResult: Button) {
-        val editText = editText ?: return
+    private fun setButtonResultClickListener(buttonResult: Button, editText: EditText) {
         buttonResult.setOnClickListener {
             val regexpMode = regexpMode ?: return@setOnClickListener
             val newStr = editText.text.toString()
