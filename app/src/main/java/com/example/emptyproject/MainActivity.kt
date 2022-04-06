@@ -4,8 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.Button
+import android.widget.ScrollView
 import android.widget.TextView
 
 const val FIRST_THREAD_SLEEP_TIME = 100L
@@ -20,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private var firstThread: Thread? = null
     private var secondThread: Thread? = null
     private var fourthThread: Thread? = null
+    private var scrollViewMain : ScrollView? = null
 
     @Volatile
     private var threadToStop: Int = -1
@@ -30,8 +35,13 @@ class MainActivity : AppCompatActivity() {
 
         buttonStart = findViewById(R.id.button_start)
         textViewMain = findViewById(R.id.text_view_main)
+        scrollViewMain = findViewById(R.id.scroll_view_main)
 
+        val textViewMain = textViewMain ?: return
         val buttonStart = buttonStart ?: return
+        val scrollViewMain = scrollViewMain ?: return
+
+        addChangeTextListener(textViewMain, scrollViewMain)
 
         buttonStart.setOnClickListener {
             buttonStart.isEnabled = false
@@ -170,5 +180,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return numberOfDivisors == 2
+    }
+
+    private fun addChangeTextListener(textViewMain: TextView, scrollView: ScrollView) {
+        textViewMain.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
     }
 }
