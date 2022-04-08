@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.Button
 import android.widget.ScrollView
@@ -58,6 +57,7 @@ class MainActivity : AppCompatActivity() {
             while (true) {
                 if (threadToStop == 1) {
                     Log.v("msg","1st thread finished")
+                    return@Thread
                 }
 
                 Handler(Looper.getMainLooper()).post {
@@ -65,9 +65,6 @@ class MainActivity : AppCompatActivity() {
                     clearMessages()
                 }
 
-                if (threadToStop == 1) {
-                    return@Thread
-                }
                 Thread.sleep(FIRST_THREAD_SLEEP_TIME)
             }
         }
