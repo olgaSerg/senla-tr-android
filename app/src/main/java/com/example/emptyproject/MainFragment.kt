@@ -37,13 +37,20 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         buttonStart.setOnClickListener {
             firstTask = MyFirstTask()
-            firstTask!!.executeOnExecutor(executor)
+            if (firstTask != null) {
+                firstTask!!.executeOnExecutor(executor)
+            }
             secondTask = MySecondTask()
-            secondTask!!.executeOnExecutor(executor)
+            if (secondTask != null) {
+                secondTask!!.executeOnExecutor(executor)
+            }
             val thirdTask = MyThirdTask()
             thirdTask.executeOnExecutor(executor)
             fourthTask = MyFourthTask()
-            fourthTask!!.executeOnExecutor(executor)
+            if (fourthTask != null) {
+                fourthTask!!.executeOnExecutor(executor)
+            }
+
             App.instance?.getState()?.isRunning = true
             displayState()
             needToStop = false
@@ -91,7 +98,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                     return null
                 }
                 Thread.sleep(FIRST_THREAD_SLEEP_TIME)
-                App.instance!!.getState().printText()
+                if (App.instance != null) {
+                    App.instance!!.getState().printText()
+                }
                 publishProgress()
             }
             return null
@@ -116,7 +125,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 }
 
                 if (isPrimeNumber(number)) {
-                    App.instance!!.getState().appendMessage("$number")
+                    if (App.instance != null) {
+                        App.instance!!.getState().appendMessage("$number")
+                    }
                     if (fourthTask != null) {
                         synchronized(fourthTask!!) {
                             (fourthTask as java.lang.Object).notify()
@@ -136,7 +147,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             var number = 1
             while (true) {
                 Thread.sleep(THIRD_THREAD_SLEEP_TIME)
-                App.instance!!.getState().appendMessage("$number")
+                if (App.instance != null) {
+                    App.instance!!.getState().appendMessage("$number")
+                }
                 if (number == 10) {
                     needToStop = true
 
@@ -176,7 +189,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                         (fourthTask as java.lang.Object).wait()
                     }
                 }
-                App.instance!!.getState().appendMessage("Yap!")
+                if (App.instance != null) {
+                    App.instance!!.getState().appendMessage("Yap!")
+                }
             }
         }
     }
@@ -184,7 +199,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private fun displayState() {
         val buttonStart: Button = view?.findViewById(R.id.button_start) ?: return
         val textViewMain: TextView = view?.findViewById(R.id.text_view_main) ?: return
-        buttonStart.isEnabled = !App.instance!!.getState().isRunning
-        textViewMain.text = App.instance!!.getState().printedText
+        if (App.instance != null) {
+            buttonStart.isEnabled = !App.instance!!.getState().isRunning
+            textViewMain.text = App.instance!!.getState().printedText
+        }
     }
 }

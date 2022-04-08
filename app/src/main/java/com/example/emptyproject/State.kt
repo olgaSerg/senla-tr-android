@@ -2,7 +2,11 @@ package com.example.emptyproject
 
 import android.util.Log
 
-class State(var messagesBuffer: ArrayList<String> = arrayListOf(), var printedText: String = "", var isRunning: Boolean = false) {
+class State(
+    var messagesBuffer: ArrayList<String> = arrayListOf(),
+    var printedText: String = "",
+    var isRunning: Boolean = false
+) {
 
     @Synchronized
     fun appendMessage(message: String) {
