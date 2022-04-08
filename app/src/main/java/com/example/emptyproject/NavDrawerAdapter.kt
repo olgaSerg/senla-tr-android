@@ -26,14 +26,14 @@ class NavDrawerAdapter(
             holder.textViewNavigation.text = itemsNavigation[adapterPosition].name
             holder.imageViewNavigation.setImageResource(itemsNavigation[adapterPosition].image)
 
-//            val itemColor = holder.itemViewNavigation.context.resources.getColor(
-//                if (selectedItem == adapterPosition)
-//                    R.color.color_checked_item
-//                else
-//                    R.color.color_unchecked_item
-//            )
+            val itemColor = holder.itemViewNavigation.context.resources.getColor(
+                if (selectedItem == holder.adapterPosition)
+                    R.color.color_checked_item
+                else
+                    R.color.color_unchecked_item
+            )
 
-//            holder.itemView.setBackgroundColor(itemColor)
+            holder.itemView.setBackgroundColor(itemColor)
         }
     }
 
@@ -56,9 +56,11 @@ class NavDrawerAdapter(
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         selectedItem = holder.adapterPosition
-        holder.bind(holder, selectedItem)
+
+        holder.bind(holder, holder.adapterPosition)
         setItemViewNavigationOnClickListener(holder)
     }
+
 
     private fun setItemViewNavigationOnClickListener(holder: ItemViewHolder) {
         holder.itemViewNavigation.setOnClickListener {

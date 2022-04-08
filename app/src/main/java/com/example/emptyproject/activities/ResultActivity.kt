@@ -20,18 +20,17 @@ class ResultActivity : AppCompatActivity() {
         setContentView(R.layout.activity_result)
 
         textView = findViewById(R.id.text_view_result)
-        val textView = textView ?: return
+        toolbar = findViewById(R.id.toolbar_result_activity)
 
+        val textView = textView ?: return
+        val toolbar = toolbar ?: return
         textView.text = intent.getStringExtra(RESULT)
 
-        setToolbar()
+        setToolbar(toolbar)
 
     }
 
-    private fun setToolbar() {
-        toolbar = findViewById(R.id.toolbar_result_activity)
-        val toolbar = toolbar ?: return
-
+    private fun setToolbar(toolbar: Toolbar) {
         toolbar.title = getString(R.string.result_title)
 
         setSupportActionBar(toolbar)

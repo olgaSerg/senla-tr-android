@@ -9,14 +9,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.emptyproject.*
 import com.example.emptyproject.fragments.MainFragment
 import com.example.emptyproject.fragments.SettingFragment
-import android.app.Activity
 import android.content.Context
-import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 
 
 class MainActivity : AppCompatActivity(), MainFragment.OnFragmentClickListener,
@@ -43,7 +41,7 @@ class MainActivity : AppCompatActivity(), MainFragment.OnFragmentClickListener,
             drawerLayout.openDrawer(Gravity.LEFT)
         }
 
-//        (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         val itemsNavigation = createItemsNavigationArray()
         sendClickPosition(itemsNavigation[0])
