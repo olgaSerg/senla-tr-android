@@ -20,6 +20,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private var firstTask: MyFirstTask? = null
     private var secondTask: MySecondTask? = null
     private var fourthTask: MyFourthTask? = null
+    private var buttonStart: Button? = null
+    private var textViewMain: TextView? = null
+    private var scrollViewMain: ScrollView? = null
 
     @Volatile
     private var needToStop: Boolean = false
@@ -27,9 +30,13 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val buttonStart: Button = view.findViewById(R.id.button_start) ?: return
-        val textViewMain: TextView = view.findViewById(R.id.text_view_main) ?: return
-        val scrollViewMain: ScrollView = view.findViewById(R.id.scroll_view_main) ?: return
+        buttonStart = view.findViewById(R.id.button_start)
+        textViewMain = view.findViewById(R.id.text_view_main)
+        scrollViewMain = view.findViewById(R.id.scroll_view_main) ?: return
+
+        val buttonStart = buttonStart ?: return
+        val textViewMain = textViewMain ?: return
+        val scrollViewMain = scrollViewMain ?: return
 
         addChangeTextListener(textViewMain, scrollViewMain)
 
@@ -102,6 +109,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                     App.instance!!.getState().printText()
                 }
                 publishProgress()
+
             }
             return null
         }
@@ -190,18 +198,16 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                     }
                 }
                 if (App.instance != null) {
-                    App.instance!!.getState().appendMessage("Yap!")
+                    App.instance!!.getState().appendMessage("Yup!")
                 }
             }
         }
     }
 
     private fun displayState() {
-        val buttonStart: Button = view?.findViewById(R.id.button_start) ?: return
-        val textViewMain: TextView = view?.findViewById(R.id.text_view_main) ?: return
         if (App.instance != null) {
-            buttonStart.isEnabled = !App.instance!!.getState().isRunning
-            textViewMain.text = App.instance!!.getState().printedText
+            buttonStart?.isEnabled = !App.instance!!.getState().isRunning
+            textViewMain?.text = App.instance!!.getState().printedText
         }
     }
 }
