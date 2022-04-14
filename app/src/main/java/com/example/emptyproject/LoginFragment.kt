@@ -14,6 +14,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.io.Serializable
 import android.app.Activity
+import android.text.Editable
 import java.lang.ClassCastException
 
 
@@ -47,6 +48,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("email", editTextEmail?.text.toString())
+        outState.putString("password", editTextPassword?.text.toString())
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -60,6 +67,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val editTextPassword = editTextPassword ?: return
         val buttonLogin = buttonLogin ?: return
 
+        if (savedInstanceState != null) {
+            val email = savedInstanceState.getString("email")
+            val password = savedInstanceState.getString("password")
+
+            editTextEmail.text = Editable.Factory.getInstance().newEditable(email)
+            editTextPassword.text = Editable.Factory.getInstance().newEditable(password)
+        }
+
         buttonLogin.setOnClickListener {
             if (!checkLogin(editTextEmail, editTextPassword)) {
                 return@setOnClickListener
@@ -68,8 +83,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             val password = editTextPassword.text.toString()
 
             val jsonObject = JSONObject("{\"email\":\"$email\", \"password\":\"$password\"}")
+
             val myTask = LoginTask()
             myTask.execute(jsonObject.toString(), email)
+
         }
     }
 
@@ -158,8 +175,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
                 dataSendListener?.sendProfile(profile)
 
-//                val bundle = Bundle()
-//                bundle.putSerializable("profile", profile)
                 return null
             }
         }

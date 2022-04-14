@@ -6,15 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".ProfileFragment">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         android:layout_marginBottom="70dp"
-        android:fillViewport="true">
+        app:layout_constraintBottom_toTopOf="@id/button_logout">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
 
             <TextView
                 android:id="@+id/text_view_notes_title"
@@ -136,7 +138,7 @@
                 app:layout_constraintStart_toEndOf="@id/text_view_email_title"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <Button
         android:id="@+id/button_logout"

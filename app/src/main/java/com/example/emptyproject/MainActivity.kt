@@ -4,16 +4,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import java.io.Serializable
 
-class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener {
-
+class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener, ProfileFragment.OnSendClickLogout {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, LoginFragment.newInstance())
-            commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.fragment_container, LoginFragment.newInstance())
+                commit()
+            }
         }
     }
 
@@ -24,6 +25,13 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener {
         profileFragment.arguments = args
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, profileFragment)
+            commit()
+        }
+    }
+
+    override fun clickLogout() {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, LoginFragment.newInstance())
             commit()
         }
     }
