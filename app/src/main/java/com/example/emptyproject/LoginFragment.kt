@@ -107,8 +107,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             val jsonObject = JSONObject("{\"email\":\"$email\", \"password\":\"$password\"}")
 
-            val myTask = LoginTask()
-            myTask.execute(jsonObject.toString(), email)
+            val loginTask = LoginTask()
+            loginTask.execute(jsonObject.toString(), email)
         }
     }
 
