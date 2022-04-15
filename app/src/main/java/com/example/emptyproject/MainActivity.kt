@@ -68,14 +68,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun doInBackground(vararg params: String?): String? {
-            val request: Request? = params[0]?.let {
+            if (params[0] == null) return null
+            val request: Request =
                 Request.Builder()
-                    .url(it)
+                    .url(params[0]!!)
                     .build()
-            }
             val client = OkHttpClient()
             try {
-                val response: Response = client.newCall(request!!).execute()
+                val response: Response = client.newCall(request).execute()
                 if (response.isSuccessful) {
                     return response.body?.string()
                 } else {
