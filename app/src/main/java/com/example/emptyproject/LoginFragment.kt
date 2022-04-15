@@ -105,7 +105,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             val email = editTextEmail.text.toString()
             val password = editTextPassword.text.toString()
 
-            val jsonObject = JSONObject("{\"email\":\"$email\", \"password\":\"$password\"}")
+            val jsonObject = JSONObject()
+            jsonObject.put("email", email)
+            jsonObject.put("password", password)
 
             val loginTask = LoginTask()
             loginTask.execute(jsonObject.toString(), email)
@@ -148,16 +150,21 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 client.newCall(request).execute().use { response ->
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                    val jsonData: String = response.body!!.string()
-                    val jsonObject = JSONObject(jsonData)
-                    if (jsonObject.getString("status") == "error") {
-                        val jsonMessage = jsonObject.getString("message")
-                        return "Error: $jsonMessage"
+                    if (response.body != null) {
+                        val jsonData: String = response.body!!.string()
+                        val jsonObject = JSONObject(jsonData)
+                        if (jsonObject.getString("status") == "error") {
+                            val jsonMessage = jsonObject.getString("message")
+                            return "Error: $jsonMessage"
+                        }
+                        var token = jsonObject.getString("token")
+                        val jsonTokenObject = JSONObject()
+                        jsonTokenObject.put("token", token)
+                        token = jsonTokenObject.toString()
+
+                        val getProfileTask = ProfileTask()
+                        getProfileTask.execute(token, params[1])
                     }
-                    var token = jsonObject.getString("token")
-                    token = JSONObject("{\"token\":\"$token\"}").toString()
-                    val getProfileTask = ProfileTask()
-                    getProfileTask.execute(token, params[1])
                 }
             } catch (e: SocketTimeoutException) {
                 errorText = getString(R.string.error_connection)
@@ -189,30 +196,31 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 client.newCall(request).execute().use { response ->
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                    val jsonData: String = response.body!!.string()
-                    val jsonObject = JSONObject(jsonData)
+                    if (response.body != null) {
+                        val jsonData: String = response.body!!.string()
+                        val jsonObject = JSONObject(jsonData)
 
-                    val date = Date(jsonObject.getInt("birthDate") * 1000L)
-                    val dateFormat = SimpleDateFormat("dd.MM.yyyy")
-                    val birthDate: String = dateFormat.format(date)
+                        val date = Date(jsonObject.getInt("birthDate") * 1000L)
+                        val dateFormat = SimpleDateFormat("dd.MM.yyyy")
+                        val birthDate: String = dateFormat.format(date)
 
-                    val profile = Profile(
-                        email = params[1],
-                        firstName = jsonObject.getString("firstName"),
-                        lastName = jsonObject.getString("lastName"),
-                        birthDate = birthDate,
-                        notes = jsonObject.getString("notes")
-                    ) as Serializable
+                        val profile = Profile(
+                            email = params[1],
+                            firstName = jsonObject.getString("firstName"),
+                            lastName = jsonObject.getString("lastName"),
+                            birthDate = birthDate,
+                            notes = jsonObject.getString("notes")
+                        ) as Serializable
 
-                    dataSendListener?.sendProfile(profile)
-
-                    return null
+                        dataSendListener?.sendProfile(profile)
+                    }
                 }
             } catch (e: SocketTimeoutException) {
                 errorText = getString(R.string.error_connection)
                 errorOccurred = true
                 return errorText
             }
+            return null
         }
 
         override fun onPostExecute(result: String?) {
@@ -220,4 +228,5 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 }
+
 
