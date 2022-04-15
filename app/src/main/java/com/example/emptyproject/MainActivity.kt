@@ -11,9 +11,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
-import okhttp3.*
+import okhttp3.Request
 import okhttp3.Response
 import okhttp3.OkHttpClient
+import java.net.SocketTimeoutException
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,8 +38,9 @@ class MainActivity : AppCompatActivity() {
             val editTextMain = editTextMain ?: return@setOnClickListener
             val parameter = Uri.encode(editTextMain.text.toString())
             val url = "${URL}$parameter"
-            val myTask = MyTask()
-            myTask.execute(url)
+            val resultTask = ResultTask()
+
+            resultTask.execute(url)
             buttonResult.isEnabled = false
             hideKeyboard()
         }
@@ -46,17 +48,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+
         outState.putString(TEXT_VIEW_RESULT, textViewResult?.text.toString())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val text = savedInstanceState.getString(TEXT_VIEW_RESULT)
-        text ?: return
-        textViewResult?.text = text
+
+        val text = savedInstanceState.getString(TEXT_VIEW_RESULT) ?: return
+        val textViewResult = textViewResult ?: return
+        textViewResult.text = text
     }
 
-    inner class MyTask : AsyncTask<String, Void, String>() {
+    inner class ResultTask : AsyncTask<String, Void, String>() {
         override fun onPreExecute() {
             super.onPreExecute()
             val progressBar = progressBar ?: return
@@ -70,22 +74,28 @@ class MainActivity : AppCompatActivity() {
                     .build()
             }
             val client = OkHttpClient()
-            val response: Response = client.newCall(request!!).execute()
-            if (response.isSuccessful) {
-                return response.body?.string()
-            } else {
-                response.body?.close()
+            try {
+                val response: Response = client.newCall(request!!).execute()
+                if (response.isSuccessful) {
+                    return response.body?.string()
+                } else {
+                    response.body?.close()
+                }
+            } catch (e: SocketTimeoutException) {
+                return getString(R.string.error_connection)
             }
             return null
         }
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            textViewResult?.text = result
+            val textViewResult = textViewResult ?: return
             val progressBar = progressBar ?: return
-            progressBar.visibility = View.GONE
+            val buttonResult = buttonResult ?: return
 
-            buttonResult?.isEnabled = true
+            textViewResult.text = result
+            progressBar.visibility = View.GONE
+            buttonResult.isEnabled = true
         }
     }
 
@@ -100,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         const val TEXT_VIEW_RESULT = "resultText"
     }
 }
+
 
 
 
