@@ -1,4 +1,5 @@
 package com.example.emptyproject
+
 import java.io.Serializable
 
 data class Profile(

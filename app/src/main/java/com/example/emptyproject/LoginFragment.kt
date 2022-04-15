@@ -8,7 +8,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
-import okhttp3.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
@@ -16,9 +17,13 @@ import java.io.Serializable
 import android.app.Activity
 import android.text.Editable
 import java.lang.ClassCastException
-
+import java.net.SocketTimeoutException
+import java.text.SimpleDateFormat
+import java.util.Date
 
 const val URL = "https://pub.zame-dev.org/senla-training-addition/lesson-20.php?method="
+const val EMAIL = "email"
+const val PASSWORD = "password"
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -27,7 +32,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private var buttonLogin: Button? = null
     private var textViewError: TextView? = null
     private var progressBar: ProgressBar? = null
-    var dataSendListener: OnDataSendListener? = null
+    private var dataSendListener: OnDataSendListener? = null
+    private var errorOccurred: Boolean = false
+    private var errorText: String = ""
 
     companion object {
 
@@ -35,12 +42,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             return LoginFragment()
         }
     }
+
     interface OnDataSendListener {
         fun sendProfile(profile: Serializable)
     }
 
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
+
         dataSendListener = try {
             activity as OnDataSendListener
         } catch (e: ClassCastException) {
@@ -50,33 +59,47 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("email", editTextEmail?.text.toString())
-        outState.putString("password", editTextPassword?.text.toString())
+
+        val editTextEmail = editTextEmail ?: return
+        val editTextPassword = editTextPassword ?: return
+        outState.putString(EMAIL, editTextEmail.text.toString())
+        outState.putString(PASSWORD, editTextPassword.text.toString())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        editTextEmail = view.findViewById(R.id.edit_text_email)
-        editTextPassword = view.findViewById(R.id.edit_text_password)
-        buttonLogin = view.findViewById(R.id.button_login)
-        textViewError = view.findViewById(R.id.text_view_error)
-        progressBar = view.findViewById(R.id.progress_bar)
+        initializeFields(view)
 
         val editTextEmail = editTextEmail ?: return
         val editTextPassword = editTextPassword ?: return
         val buttonLogin = buttonLogin ?: return
 
         if (savedInstanceState != null) {
-            val email = savedInstanceState.getString("email")
-            val password = savedInstanceState.getString("password")
+            val email = savedInstanceState.getString(EMAIL)
+            val password = savedInstanceState.getString(PASSWORD)
 
             editTextEmail.text = Editable.Factory.getInstance().newEditable(email)
             editTextPassword.text = Editable.Factory.getInstance().newEditable(password)
         }
 
-        buttonLogin.setOnClickListener {
-            if (!checkLogin(editTextEmail, editTextPassword)) {
+        setButtonLoginClickListener(buttonLogin)
+    }
+
+    private fun initializeFields(view: View) {
+        editTextEmail = view.findViewById(R.id.edit_text_email)
+        editTextPassword = view.findViewById(R.id.edit_text_password)
+        buttonLogin = view.findViewById(R.id.button_login)
+        textViewError = view.findViewById(R.id.text_view_error)
+        progressBar = view.findViewById(R.id.progress_bar)
+    }
+
+    private fun setButtonLoginClickListener(button: Button) {
+        val editTextEmail = editTextEmail ?: return
+        val editTextPassword = editTextPassword ?: return
+
+        button.setOnClickListener {
+            if (!isLoginSuccessful(editTextEmail, editTextPassword)) {
                 return@setOnClickListener
             }
             val email = editTextEmail.text.toString()
@@ -86,11 +109,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             val myTask = LoginTask()
             myTask.execute(jsonObject.toString(), email)
-
         }
     }
 
-    private fun checkLogin(email: EditText, password: EditText): Boolean {
+    private fun isLoginSuccessful(email: EditText, password: EditText): Boolean {
         email.error = null
         password.error = null
 
@@ -99,11 +121,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         if (email.text.toString() == "") {
-            email.error = "Заполните пустое поле"
+            email.error = getString(R.string.error_empty_field)
         }
 
         if (password.text.toString() == "") {
-            password.error = "Заполните пустое поле"
+            password.error = getString(R.string.error_empty_field)
         }
         return false
     }
@@ -122,19 +144,25 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 .method("POST", requestBody)
                 .url(URL + "login")
                 .build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            try {
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                val jsonData: String = response.body!!.string()
-                val jsonObject = JSONObject(jsonData)
-                if (jsonObject.getString("status") == "error") {
-                    val jsonMessage = jsonObject.getString("message")
-                    return "Error: $jsonMessage"
+                    val jsonData: String = response.body!!.string()
+                    val jsonObject = JSONObject(jsonData)
+                    if (jsonObject.getString("status") == "error") {
+                        val jsonMessage = jsonObject.getString("message")
+                        return "Error: $jsonMessage"
+                    }
+                    var token = jsonObject.getString("token")
+                    token = JSONObject("{\"token\":\"$token\"}").toString()
+                    val getProfileTask = ProfileTask()
+                    getProfileTask.execute(token, params[1])
                 }
-                var token = jsonObject.getString("token")
-                token = JSONObject("{\"token\":\"$token\"}").toString()
-                val getProfileTask = ProfileTask()
-                getProfileTask.execute(token, params[1])
+            } catch (e: SocketTimeoutException) {
+                errorText = getString(R.string.error_connection)
+                errorOccurred = true
+                return errorText
             }
             return null
         }
@@ -149,7 +177,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
-    inner class ProfileTask(): AsyncTask<String, Void, String>() {
+    inner class ProfileTask() : AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String?): String? {
             val client = OkHttpClient()
             val requestBody = params[0]?.toRequestBody()
@@ -157,31 +185,39 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 .method("POST", requestBody)
                 .url(URL + "profile")
                 .build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            try {
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                val jsonData: String = response.body!!.string()
-                val jsonObject = JSONObject(jsonData)
+                    val jsonData: String = response.body!!.string()
+                    val jsonObject = JSONObject(jsonData)
 
+                    val date = Date(jsonObject.getInt("birthDate") * 1000L)
+                    val dateFormat = SimpleDateFormat("dd.MM.yyyy")
+                    val birthDate: String = dateFormat.format(date)
 
-                val profile = Profile(
-                    email = params[1],
-                    firstName = jsonObject.getString("firstName"),
-                    lastName = jsonObject.getString("lastName"),
-                    birthDate = jsonObject.getString("birthDate"),
-                    notes = jsonObject.getString("notes")
-                ) as Serializable
-                println(profile)
+                    val profile = Profile(
+                        email = params[1],
+                        firstName = jsonObject.getString("firstName"),
+                        lastName = jsonObject.getString("lastName"),
+                        birthDate = birthDate,
+                        notes = jsonObject.getString("notes")
+                    ) as Serializable
 
-                dataSendListener?.sendProfile(profile)
+                    dataSendListener?.sendProfile(profile)
 
-                return null
+                    return null
+                }
+            } catch (e: SocketTimeoutException) {
+                errorText = getString(R.string.error_connection)
+                errorOccurred = true
+                return errorText
             }
         }
+
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
         }
     }
 }
-
 

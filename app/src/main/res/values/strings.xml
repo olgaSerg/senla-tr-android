@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">EmptyProject</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="login">Login</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
@@ -9,4 +8,7 @@
     <string name="last_name">Last name:</string>
     <string name="first_name">First name:</string>
     <string name="email_title">Email:</string>
+    <string name="logout">Logout</string>
+    <string name="error_empty_field">Заполните пустое поле</string>
+    <string name="error_connection">Error: connection failed</string>
 </resources>

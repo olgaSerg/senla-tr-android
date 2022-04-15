@@ -2,6 +2,7 @@ package com.example.emptyproject
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import java.io.Serializable
 
 class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener, ProfileFragment.OnSendClickLogout {
@@ -11,18 +12,27 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener, Prof
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_container, LoginFragment.newInstance())
-                commit()
-            }
+            loadLoginFragment()
+        }
+    }
+
+    private fun loadLoginFragment() {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, LoginFragment.newInstance())
+            commit()
         }
     }
 
     override fun sendProfile(profile: Serializable) {
         val profileFragment = ProfileFragment.newInstance()
         val args = Bundle()
-        args.putSerializable("profile", profile)
+        args.putSerializable(PROFILE, profile)
         profileFragment.arguments = args
+
+        loadProfileFragment(profileFragment)
+    }
+
+    private fun loadProfileFragment(profileFragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, profileFragment)
             commit()
@@ -30,9 +40,11 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener, Prof
     }
 
     override fun clickLogout() {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, LoginFragment.newInstance())
-            commit()
-        }
+        loadLoginFragment()
+    }
+
+    companion object {
+
+        const val PROFILE = "profile"
     }
 }

@@ -25,7 +25,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
     }
 
-    interface OnSendClickLogout{
+    interface OnSendClickLogout {
         fun clickLogout()
     }
 
@@ -41,33 +41,38 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        textViewEmail = view.findViewById(R.id.text_view_email)
-        textViewFirstName = view.findViewById(R.id.text_view_first_name)
-        textViewLastName = view.findViewById(R.id.text_view_last_name)
-        textViewBirthDate = view.findViewById(R.id.text_view_birth_date)
-        textViewNotes = view.findViewById(R.id.text_view_notes)
-        buttonLogout = view.findViewById(R.id.button_logout)
+        initializeFields(view)
 
-        val textViewEmail = textViewEmail ?: return
-        val textViewFirstName = textViewFirstName ?: return
-        val textViewLastName = textViewLastName ?: return
-        val textViewBirthDate = textViewBirthDate ?: return
-        val textViewNotes = textViewNotes ?: return
         val buttonLogout = buttonLogout ?: return
+        val profile: Profile = arguments?.getSerializable(MainActivity.PROFILE) as Profile
 
-        val profile: Profile = arguments?.getSerializable("profile") as Profile
-
-        textViewEmail.text = profile.email
-        textViewFirstName.text = profile.firstName
-        textViewLastName.text = profile.lastName
-        textViewBirthDate.text = profile.birthDate
-        textViewNotes.text = profile.notes
+        displayProfile(profile)
 
         buttonLogout.setOnClickListener {
             clickLogoutListener?.clickLogout()
         }
     }
 
+    private fun initializeFields(view: View) {
+        textViewEmail = view.findViewById(R.id.text_view_email)
+        textViewFirstName = view.findViewById(R.id.text_view_first_name)
+        textViewLastName = view.findViewById(R.id.text_view_last_name)
+        textViewBirthDate = view.findViewById(R.id.text_view_birth_date)
+        textViewNotes = view.findViewById(R.id.text_view_notes)
+        buttonLogout = view.findViewById(R.id.button_logout)
+    }
 
+    private fun displayProfile(profile: Profile) {
+        val textViewEmail = textViewEmail ?: return
+        val textViewFirstName = textViewFirstName ?: return
+        val textViewLastName = textViewLastName ?: return
+        val textViewBirthDate = textViewBirthDate ?: return
+        val textViewNotes = textViewNotes ?: return
 
+        textViewEmail.text = profile.email
+        textViewFirstName.text = profile.firstName
+        textViewLastName.text = profile.lastName
+        textViewBirthDate.text = profile.birthDate
+        textViewNotes.text = profile.notes
+    }
 }
