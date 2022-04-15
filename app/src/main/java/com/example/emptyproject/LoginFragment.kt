@@ -62,6 +62,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         val editTextEmail = editTextEmail ?: return
         val editTextPassword = editTextPassword ?: return
+
         outState.putString(EMAIL, editTextEmail.text.toString())
         outState.putString(PASSWORD, editTextPassword.text.toString())
     }
@@ -153,17 +154,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     if (response.body != null) {
                         val jsonData: String = response.body!!.string()
                         val jsonObject = JSONObject(jsonData)
-                        if (jsonObject.getString("status") == "error") {
-                            val jsonMessage = jsonObject.getString("message")
-                            return "Error: $jsonMessage"
-                        }
-                        var token = jsonObject.getString("token")
-                        val jsonTokenObject = JSONObject()
-                        jsonTokenObject.put("token", token)
-                        token = jsonTokenObject.toString()
+                        catchError(jsonObject)
 
                         val getProfileTask = ProfileTask()
-                        getProfileTask.execute(token, params[1])
+                        getProfileTask.execute(getToken(jsonObject), params[1])
                     }
                 }
             } catch (e: SocketTimeoutException) {
@@ -181,6 +175,23 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             progressBar.visibility = View.GONE
             textViewError.text = result
+        }
+
+        private fun catchError(jsonObject: JSONObject): String {
+            if (jsonObject.getString("status") == "error") {
+                val jsonMessage = jsonObject.getString("message")
+                return "Error: $jsonMessage"
+            }
+            return ""
+        }
+
+        private fun getToken(jsonObject: JSONObject): String {
+            val token = jsonObject.getString("token")
+            val jsonTokenObject = JSONObject()
+
+            jsonTokenObject.put("token", token)
+
+            return jsonTokenObject.toString()
         }
     }
 
@@ -200,17 +211,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                         val jsonData: String = response.body!!.string()
                         val jsonObject = JSONObject(jsonData)
 
-                        val date = Date(jsonObject.getInt("birthDate") * 1000L)
-                        val dateFormat = SimpleDateFormat("dd.MM.yyyy")
-                        val birthDate: String = dateFormat.format(date)
-
-                        val profile = Profile(
-                            email = params[1],
-                            firstName = jsonObject.getString("firstName"),
-                            lastName = jsonObject.getString("lastName"),
-                            birthDate = birthDate,
-                            notes = jsonObject.getString("notes")
-                        ) as Serializable
+                        val profile = fillProfileObject(jsonObject, params[1])
 
                         dataSendListener?.sendProfile(profile)
                     }
@@ -221,6 +222,22 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 return errorText
             }
             return null
+        }
+
+        private fun fillProfileObject(jsonObject: JSONObject, email: String?): Serializable {
+            return Profile(
+                email = email,
+                firstName = jsonObject.getString("firstName"),
+                lastName = jsonObject.getString("lastName"),
+                birthDate = getBirthDate(jsonObject),
+                notes = jsonObject.getString("notes")
+            )
+        }
+
+        private fun getBirthDate(jsonObject: JSONObject): String {
+            val date = Date(jsonObject.getInt("birthDate") * 1000L)
+            val dateFormat = SimpleDateFormat("dd.MM.yyyy")
+            return dateFormat.format(date)
         }
 
         override fun onPostExecute(result: String?) {
