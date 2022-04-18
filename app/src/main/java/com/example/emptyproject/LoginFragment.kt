@@ -22,8 +22,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 const val URL = "https://pub.zame-dev.org/senla-training-addition/lesson-20.php?method="
+const val ERROR = "error"
 const val EMAIL = "email"
 const val PASSWORD = "password"
+const val TOKEN = "token"
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -35,6 +37,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private var dataSendListener: OnDataSendListener? = null
     private var errorOccurred: Boolean = false
     private var errorText: String = ""
+    private var loginTask: LoginTask? = null
 
     companion object {
 
@@ -57,21 +60,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        val editTextEmail = editTextEmail ?: return
-        val editTextPassword = editTextPassword ?: return
-
-        outState.putString(EMAIL, editTextEmail.text.toString())
-        outState.putString(PASSWORD, editTextPassword.text.toString())
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initializeFields(view)
 
+        val textViewError = textViewError ?: return
         val editTextEmail = editTextEmail ?: return
         val editTextPassword = editTextPassword ?: return
         val buttonLogin = buttonLogin ?: return
@@ -79,12 +73,26 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         if (savedInstanceState != null) {
             val email = savedInstanceState.getString(EMAIL)
             val password = savedInstanceState.getString(PASSWORD)
+            val textError = savedInstanceState.getString(ERROR)
 
+            textViewError.text = Editable.Factory.getInstance().newEditable(textError)
             editTextEmail.text = Editable.Factory.getInstance().newEditable(email)
             editTextPassword.text = Editable.Factory.getInstance().newEditable(password)
         }
 
         setButtonLoginClickListener(buttonLogin)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        val textViewError = textViewError ?: return
+        val editTextEmail = editTextEmail ?: return
+        val editTextPassword = editTextPassword ?: return
+
+        outState.putString(ERROR, textViewError.text.toString())
+        outState.putString(EMAIL, editTextEmail.text.toString())
+        outState.putString(PASSWORD, editTextPassword.text.toString())
     }
 
     private fun initializeFields(view: View) {
@@ -100,6 +108,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val editTextPassword = editTextPassword ?: return
 
         button.setOnClickListener {
+            button.isEnabled = false
             if (!isLoginSuccessful(editTextEmail, editTextPassword)) {
                 return@setOnClickListener
             }
@@ -110,8 +119,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             jsonObject.put("email", email)
             jsonObject.put("password", password)
 
-            val loginTask = LoginTask()
-            loginTask.execute(jsonObject.toString(), email)
+            loginTask = LoginTask()
+            if (loginTask != null) {
+                loginTask!!.execute(jsonObject.toString(), email)
+            }
         }
     }
 
@@ -154,10 +165,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     if (response.body != null) {
                         val jsonData: String = response.body!!.string()
                         val jsonObject = JSONObject(jsonData)
-                        catchError(jsonObject)
+                        val errorString = catchError(jsonObject)
 
-                        val getProfileTask = ProfileTask()
-                        getProfileTask.execute(getToken(jsonObject), params[1])
+                        if (errorString == "") {
+                            val getProfileTask = ProfileTask()
+                            getProfileTask.execute(getToken(jsonObject), params[1])
+                        }
+                        return errorString
                     }
                 }
             } catch (e: SocketTimeoutException) {
@@ -175,6 +189,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             progressBar.visibility = View.GONE
             textViewError.text = result
+
+            if (textViewError.text.toString().length > 1) {
+                val buttonLogin = buttonLogin ?: return
+                buttonLogin.isEnabled = true
+            }
         }
 
         private fun catchError(jsonObject: JSONObject): String {
@@ -242,6 +261,15 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
+            val buttonLogin = buttonLogin ?: return
+            buttonLogin.isEnabled = true
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (loginTask != null) {
+            loginTask!!.cancel(true)
         }
     }
 }
