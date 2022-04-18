@@ -9,11 +9,6 @@ class EditFileActivity : AppCompatActivity(), EditFileFragment.OnRefreshFilesLis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            finish()
-            return
-        }
-
         setContentView(R.layout.activity_edit_file)
 
         val fileName = intent.getStringExtra(MainActivity.FILE_NAME)
