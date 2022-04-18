@@ -40,7 +40,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         addChangeTextListener(textViewMain, scrollViewMain)
 
-        val executor = Executors.newFixedThreadPool(5)
+        val executor = Executors.newFixedThreadPool(4)
 
         buttonStart.setOnClickListener {
             firstTask = MyFirstTask()
@@ -128,7 +128,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             var number = 1
             while (true) {
                 if (needToStop) {
-                    Log.v("msg", "2st task finished")
+                    Log.v("msg", "2nd task finished")
                     return null
                 }
 
@@ -189,7 +189,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
             while (true) {
                 if (needToStop) {
-                    Log.v("msg", "4st task finished")
+                    Log.v("msg", "4th task finished")
                     return null
                 }
                 if (fourthTask != null) {
