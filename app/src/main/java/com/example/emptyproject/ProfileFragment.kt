@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import java.io.Serializable
 import java.lang.ClassCastException
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -17,11 +18,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private var textViewNotes: TextView? = null
     private var buttonLogout: Button? = null
     private var clickLogoutListener: OnSendClickLogout? = null
+    private var profile: Profile? = null
 
     companion object {
 
-        fun newInstance(): Fragment {
-            return ProfileFragment()
+        fun newInstance(profile: Serializable): Fragment {
+            val args = Bundle()
+            args.putSerializable(MainActivity.PROFILE, profile)
+            val profileFragment = ProfileFragment()
+                profileFragment.arguments = args
+            return profileFragment
         }
     }
 
@@ -44,9 +50,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         initializeFields(view)
 
         val buttonLogout = buttonLogout ?: return
-        val profile: Profile = arguments?.getSerializable(MainActivity.PROFILE) as Profile
+        profile = arguments?.getSerializable(MainActivity.PROFILE) as Profile
 
-        displayProfile(profile)
+        if (profile != null) {
+            displayProfile(profile!!)
+        } else {
+
+        }
 
         buttonLogout.setOnClickListener {
             clickLogoutListener?.clickLogout()

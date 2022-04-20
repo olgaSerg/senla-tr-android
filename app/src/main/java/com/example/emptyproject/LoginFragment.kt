@@ -26,6 +26,7 @@ const val ERROR = "error"
 const val EMAIL = "email"
 const val PASSWORD = "password"
 const val TOKEN = "token"
+const val IS_TASK_STARTED = "task_start"
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -38,6 +39,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private var errorOccurred: Boolean = false
     private var errorText: String = ""
     private var loginTask: LoginTask? = null
+    private var getProfileTask: ProfileTask? = null
+    private var isTaskStarted: Boolean = false
+    private var token: String? = null
+    private var email: String? = null
 
     companion object {
 
@@ -71,16 +76,21 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val buttonLogin = buttonLogin ?: return
 
         if (savedInstanceState != null) {
-            val email = savedInstanceState.getString(EMAIL)
+            email = savedInstanceState.getString(EMAIL)
             val password = savedInstanceState.getString(PASSWORD)
             val textError = savedInstanceState.getString(ERROR)
+            token = savedInstanceState.getString(TOKEN)
+            isTaskStarted = savedInstanceState.getBoolean(IS_TASK_STARTED)
 
             textViewError.text = Editable.Factory.getInstance().newEditable(textError)
             editTextEmail.text = Editable.Factory.getInstance().newEditable(email)
             editTextPassword.text = Editable.Factory.getInstance().newEditable(password)
         }
-
         setButtonLoginClickListener(buttonLogin)
+
+        if (isTaskStarted) {
+            buttonLogin.callOnClick()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -93,6 +103,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         outState.putString(ERROR, textViewError.text.toString())
         outState.putString(EMAIL, editTextEmail.text.toString())
         outState.putString(PASSWORD, editTextPassword.text.toString())
+        outState.putBoolean(IS_TASK_STARTED, isTaskStarted)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        loginTask?.cancel(true)
+        getProfileTask?.cancel(true)
     }
 
     private fun initializeFields(view: View) {
@@ -108,11 +125,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val editTextPassword = editTextPassword ?: return
 
         button.setOnClickListener {
-            button.isEnabled = false
-            if (!isLoginSuccessful(editTextEmail, editTextPassword)) {
+            textViewError?.text = ""
+            if (isFieldEmpty(editTextEmail) || isFieldEmpty(editTextPassword)) {
+                showError(editTextEmail)
+                showError(editTextPassword)
                 return@setOnClickListener
             }
-            val email = editTextEmail.text.toString()
+            button.isEnabled = false
+            email = editTextEmail.text.toString()
             val password = editTextPassword.text.toString()
 
             val jsonObject = JSONObject()
@@ -122,26 +142,22 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             loginTask = LoginTask()
             if (loginTask != null) {
                 loginTask!!.execute(jsonObject.toString(), email)
+                isTaskStarted = true
             }
         }
     }
 
-    private fun isLoginSuccessful(email: EditText, password: EditText): Boolean {
-        email.error = null
-        password.error = null
-
-        if (email.text.toString() != "" && password.text.toString() != "") {
+    private fun isFieldEmpty(field: EditText): Boolean {
+        if (field.text.isEmpty()) {
             return true
         }
-
-        if (email.text.toString() == "") {
-            email.error = getString(R.string.error_empty_field)
-        }
-
-        if (password.text.toString() == "") {
-            password.error = getString(R.string.error_empty_field)
-        }
         return false
+    }
+
+    private fun showError(field: EditText) {
+        if (field.text.toString() == "") {
+            field.error = getString(R.string.error_empty_field)
+        }
     }
 
     inner class LoginTask : AsyncTask<String, Void, String>() {
@@ -149,6 +165,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             super.onPreExecute()
             val progressBar = progressBar ?: return
             progressBar.visibility = View.VISIBLE
+
         }
 
         override fun doInBackground(vararg params: String?): String? {
@@ -168,8 +185,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                         val errorString = catchError(jsonObject)
 
                         if (errorString == "") {
-                            val getProfileTask = ProfileTask()
-                            getProfileTask.execute(getToken(jsonObject), params[1])
+                            getProfileTask = ProfileTask()
+                            if (getProfileTask != null) {
+                                token = getToken(jsonObject)
+                                getProfileTask!!.execute(token, params[1])
+                            }
                         }
                         return errorString
                     }
@@ -188,9 +208,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             val progressBar = progressBar ?: return
 
             progressBar.visibility = View.GONE
-            textViewError.text = result
 
-            if (textViewError.text.toString().length > 1) {
+            if (result != "") {
+                textViewError.text = result
                 val buttonLogin = buttonLogin ?: return
                 buttonLogin.isEnabled = true
             }
@@ -243,6 +263,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             return null
         }
 
+
         private fun fillProfileObject(jsonObject: JSONObject, email: String?): Serializable {
             return Profile(
                 email = email,
@@ -263,6 +284,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             super.onPostExecute(result)
             val buttonLogin = buttonLogin ?: return
             buttonLogin.isEnabled = true
+            isTaskStarted = false
         }
     }
 
@@ -272,6 +294,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             loginTask!!.cancel(true)
         }
     }
+
+
+
 }
 
 

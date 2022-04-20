@@ -2,10 +2,12 @@ package com.example.emptyproject
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import java.io.Serializable
 
-class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener, ProfileFragment.OnSendClickLogout {
+class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,
+    ProfileFragment.OnSendClickLogout {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,10 +26,7 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener, Prof
     }
 
     override fun sendProfile(profile: Serializable) {
-        val profileFragment = ProfileFragment.newInstance()
-        val args = Bundle()
-        args.putSerializable(PROFILE, profile)
-        profileFragment.arguments = args
+        val profileFragment = ProfileFragment.newInstance(profile)
 
         loadProfileFragment(profileFragment)
     }
