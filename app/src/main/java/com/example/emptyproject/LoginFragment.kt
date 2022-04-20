@@ -27,6 +27,7 @@ const val EMAIL = "email"
 const val PASSWORD = "password"
 const val TOKEN = "token"
 const val IS_TASK_STARTED = "task_start"
+const val STATUS = "status"
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -132,12 +133,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 return@setOnClickListener
             }
             button.isEnabled = false
-            email = editTextEmail.text.toString()
-            val password = editTextPassword.text.toString()
 
-            val jsonObject = JSONObject()
-            jsonObject.put("email", email)
-            jsonObject.put("password", password)
+            val jsonObject = createJsonLogin(editTextEmail, editTextPassword)
 
             loginTask = LoginTask()
             if (loginTask != null) {
@@ -160,12 +157,22 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
+    private fun createJsonLogin(editTextEmail: EditText, editTextPassword: EditText): JSONObject {
+        email = editTextEmail.text.toString()
+        val password = editTextPassword.text.toString()
+
+        val jsonObject = JSONObject()
+        jsonObject.put(EMAIL, email)
+        jsonObject.put(PASSWORD, password)
+        return jsonObject
+    }
+
+
     inner class LoginTask : AsyncTask<String, Void, String>() {
         override fun onPreExecute() {
             super.onPreExecute()
             val progressBar = progressBar ?: return
             progressBar.visibility = View.VISIBLE
-
         }
 
         override fun doInBackground(vararg params: String?): String? {
@@ -177,14 +184,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 .build()
             try {
                 client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                    if (!response.isSuccessful) throw IOException()
 
                     if (response.body != null) {
                         val jsonData: String = response.body!!.string()
                         val jsonObject = JSONObject(jsonData)
                         val errorString = catchError(jsonObject)
 
-                        if (errorString == "") {
+                        if (jsonObject.getString(STATUS) == getString(R.string.ok)) {
                             getProfileTask = ProfileTask()
                             if (getProfileTask != null) {
                                 token = getToken(jsonObject)
@@ -198,6 +205,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 errorText = getString(R.string.error_connection)
                 errorOccurred = true
                 return errorText
+            } catch (e: IOException) {
+                errorText = getString(R.string.error_message)
+                errorOccurred = true
+                return errorText
             }
             return null
         }
@@ -209,26 +220,18 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             progressBar.visibility = View.GONE
 
-            if (result != "") {
+            if (result?.isNotEmpty() == true) {
                 textViewError.text = result
                 val buttonLogin = buttonLogin ?: return
                 buttonLogin.isEnabled = true
             }
         }
 
-        private fun catchError(jsonObject: JSONObject): String {
-            if (jsonObject.getString("status") == "error") {
-                val jsonMessage = jsonObject.getString("message")
-                return "Error: $jsonMessage"
-            }
-            return ""
-        }
-
         private fun getToken(jsonObject: JSONObject): String {
-            val token = jsonObject.getString("token")
+            val token = jsonObject.getString(TOKEN)
             val jsonTokenObject = JSONObject()
 
-            jsonTokenObject.put("token", token)
+            jsonTokenObject.put(TOKEN, token)
 
             return jsonTokenObject.toString()
         }
@@ -249,20 +252,25 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     if (response.body != null) {
                         val jsonData: String = response.body!!.string()
                         val jsonObject = JSONObject(jsonData)
-
-                        val profile = fillProfileObject(jsonObject, params[1])
-
-                        dataSendListener?.sendProfile(profile)
+                        if (jsonObject.getString(STATUS) == getString(R.string.ok)) {
+                            val profile = fillProfileObject(jsonObject, params[1])
+                            dataSendListener?.sendProfile(profile)
+                        } else {
+                            return catchError(jsonObject)
+                        }
                     }
                 }
             } catch (e: SocketTimeoutException) {
                 errorText = getString(R.string.error_connection)
                 errorOccurred = true
                 return errorText
+            } catch (e: IOException) {
+                errorText = getString(R.string.error_message)
+                errorOccurred = true
+                return errorText
             }
             return null
         }
-
 
         private fun fillProfileObject(jsonObject: JSONObject, email: String?): Serializable {
             return Profile(
@@ -287,16 +295,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             isTaskStarted = false
         }
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        if (loginTask != null) {
-            loginTask!!.cancel(true)
+    private fun catchError(jsonObject: JSONObject): String {
+        if (jsonObject.getString(STATUS) == getString(R.string.error)) {
+            val jsonMessage = jsonObject.getString(getString(R.string.message))
+            return "Error: $jsonMessage"
         }
+        return ""
     }
-
-
-
 }
 
 

@@ -11,4 +11,8 @@
     <string name="logout">Logout</string>
     <string name="error_empty_field">Заполните пустое поле</string>
     <string name="error_connection">Error: connection failed</string>
+    <string name="ok">ok</string>
+    <string name="error">error</string>
+    <string name="message">message</string>
+    <string name="error_message">Error occurred</string>
 </resources>
