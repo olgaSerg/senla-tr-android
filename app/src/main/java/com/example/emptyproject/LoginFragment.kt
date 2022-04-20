@@ -21,7 +21,7 @@ import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.Date
 
-const val URL = "https://pub.zame-dev.org/senla-training-addition/lesson-20.php?method="
+const val URL = "https://pub.zame-dev.org/senla-training-addition/lesson-21.php?method="
 const val ERROR = "error"
 const val EMAIL = "email"
 const val PASSWORD = "password"
@@ -284,7 +284,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         private fun getBirthDate(jsonObject: JSONObject): String {
             val date = Date(jsonObject.getInt("birthDate") * 1000L)
-            val dateFormat = SimpleDateFormat("dd.MM.yyyy")
+            val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
             return dateFormat.format(date)
         }
 

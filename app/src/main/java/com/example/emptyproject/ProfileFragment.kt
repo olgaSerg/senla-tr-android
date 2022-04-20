@@ -1,13 +1,18 @@
 package com.example.emptyproject
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import java.io.Serializable
 import java.lang.ClassCastException
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import android.widget.Toast
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -19,6 +24,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private var buttonLogout: Button? = null
     private var clickLogoutListener: OnSendClickLogout? = null
     private var profile: Profile? = null
+    private var pullToRefresh: SwipeRefreshLayout? = null
 
     companion object {
 
@@ -50,6 +56,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         initializeFields(view)
 
         val buttonLogout = buttonLogout ?: return
+        val pullToRefresh = pullToRefresh ?: return
         profile = arguments?.getSerializable(MainActivity.PROFILE) as Profile
 
         if (profile != null) {
@@ -61,6 +68,15 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         buttonLogout.setOnClickListener {
             clickLogoutListener?.clickLogout()
         }
+
+        pullToRefresh.setOnRefreshListener(OnRefreshListener {
+            // Your code here
+            Toast.makeText(activity?.applicationContext, "Works!", Toast.LENGTH_LONG).show();
+            // To keep animation for 4 seconds
+            Handler().postDelayed({ // Stop animation (This will be after 3 seconds)
+                pullToRefresh.isRefreshing = false
+            }, 4000) // Delay in millis
+        })
     }
 
     private fun initializeFields(view: View) {
@@ -70,6 +86,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         textViewBirthDate = view.findViewById(R.id.text_view_birth_date)
         textViewNotes = view.findViewById(R.id.text_view_notes)
         buttonLogout = view.findViewById(R.id.button_logout)
+        pullToRefresh = view.findViewById(R.id.swipe_container)
     }
 
     private fun displayProfile(profile: Profile) {
