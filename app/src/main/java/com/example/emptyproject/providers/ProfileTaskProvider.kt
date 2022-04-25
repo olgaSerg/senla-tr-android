@@ -77,7 +77,6 @@ class ProfileTaskProvider {
                     }
                 }
             }
-
             throw ProfileException("Error: ")
         }
 
