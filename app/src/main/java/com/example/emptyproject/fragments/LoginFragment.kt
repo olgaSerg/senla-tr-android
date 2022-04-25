@@ -14,10 +14,11 @@ import bolts.Task
 import java.lang.ClassCastException
 import java.util.*
 import bolts.CancellationTokenSource
+import com.example.emptyproject.MainActivity
+import com.example.emptyproject.Profile
 import com.example.emptyproject.R
 import com.example.emptyproject.State
 import com.example.emptyproject.providers.LoginTaskProvider
-
 
 const val URL = "https://pub.zame-dev.org/senla-training-addition/lesson-20.php?method="
 const val TOKEN = "token"
@@ -30,20 +31,25 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private var textViewError: TextView? = null
     private var progressBar: ProgressBar? = null
     var dataSendListener: OnDataSendListener? = null
-    private var state: State = State()
+    private var state: State? = null
+
     private var loginTask: Task<Unit>? = null
 
     private var cancellationTokenSource: CancellationTokenSource? = null
 
     companion object {
 
-        fun newInstance(): Fragment {
-            return LoginFragment()
+        fun newInstance(state: State): Fragment {
+            val args = Bundle()
+            args.putSerializable(MainActivity.STATE, state)
+            val loginFragment = LoginFragment()
+            loginFragment.arguments = args
+            return loginFragment
         }
     }
 
     interface OnDataSendListener {
-        fun sendProfile(profile: Serializable)
+        fun sendProfile(profile: Profile)
     }
 
     override fun onAttach(activity: Activity) {
@@ -66,10 +72,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val buttonLogin = buttonLogin ?: return
         val editTextEmail = editTextEmail ?: return
         val editTextPassword = editTextPassword ?: return
-
-        if (savedInstanceState != null) {
-            state = savedInstanceState.getSerializable("state") as State
-        }
+        state = arguments?.getSerializable(MainActivity.STATE) as State
+        val state = state ?: return
 
         displayState()
         setButtonLoginClickListener(buttonLogin)
@@ -84,19 +88,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         editTextPassword.addTextChangedListener {
             state.password = it.toString()
         }
-
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putSerializable("state", state)
     }
 
     override fun onPause() {
         super.onPause()
 
-        cancellationTokenSource!!.cancel()
+        cancellationTokenSource?.cancel()
     }
 
     private fun initializeFields(view: View) {
@@ -113,6 +110,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val editTextPassword = editTextPassword ?: return
         val buttonLogin = buttonLogin ?: return
         val progressBar = progressBar ?: return
+        val state = state ?: return
 
         textViewError.text = state.errorText
         editTextEmail.setText(state.email)
@@ -124,10 +122,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             progressBar.visibility = View.GONE
         }
 
-        buttonLogin.isEnabled = !state.isTaskStarted
+        state.isTaskStarted = !buttonLogin.isEnabled
     }
 
-    fun getState(): State {
+    fun getState(): State? {
         return state
     }
 
@@ -136,7 +134,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val editTextPassword = editTextPassword ?: return
 
         button.setOnClickListener {
-            state.errorText = ""
+            state?.errorText = ""
             displayState()
             if (isFieldEmpty(editTextEmail) || isFieldEmpty(editTextPassword)) {
                 showError(editTextEmail)
@@ -145,10 +143,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             }
 
             cancellationTokenSource = CancellationTokenSource()
-//            cancellationTokenSource!!.cancel()
 
-
-            loginTask = LoginTaskProvider.loginAsync(this, cancellationTokenSource!!.token)
+            if (cancellationTokenSource != null) {
+                loginTask = LoginTaskProvider.loginAsync(this, cancellationTokenSource!!.token)
+            }
         }
     }
 

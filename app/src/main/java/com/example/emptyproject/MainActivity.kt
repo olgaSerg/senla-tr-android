@@ -5,7 +5,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.example.emptyproject.fragments.LoginFragment
 import com.example.emptyproject.fragments.ProfileFragment
-import java.io.Serializable
+
+private var state: State = State()
 
 class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,
     ProfileFragment.OnSendClickLogout {
@@ -15,19 +16,19 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            loadLoginFragment()
+            loadLoginFragment(state)
         }
     }
 
-    private fun loadLoginFragment() {
+    private fun loadLoginFragment(state: State) {
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, LoginFragment.newInstance())
+            replace(R.id.fragment_container, LoginFragment.newInstance(state))
             commit()
         }
     }
 
-    override fun sendProfile(profile: Serializable) {
-        val profileFragment = ProfileFragment.newInstance(profile)
+    override fun sendProfile(profile: Profile) {
+        val profileFragment = ProfileFragment.newInstance(state)
 
         loadProfileFragment(profileFragment)
     }
@@ -40,11 +41,11 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,
     }
 
     override fun clickLogout() {
-        loadLoginFragment()
+        state = State()
+        loadLoginFragment(state)
     }
 
     companion object {
-
-        const val PROFILE = "profile"
+        const val STATE = "state"
     }
 }

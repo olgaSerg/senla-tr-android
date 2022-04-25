@@ -23,7 +23,7 @@
                 android:textColor="@color/text_error"
                 android:textSize="24sp"
                 android:paddingHorizontal="20dp"
-                android:paddingVertical="100dp"
+                android:paddingVertical="70dp"
                 app:layout_constraintBottom_toTopOf="@id/edit_text_email"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

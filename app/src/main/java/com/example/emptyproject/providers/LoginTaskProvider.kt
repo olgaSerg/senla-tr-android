@@ -22,28 +22,37 @@ const val STATUS_ERROR = "error"
 class LoginTaskProvider {
 
     companion object {
-        fun loginAsync(loginFragment: LoginFragment, cancellationToken: CancellationToken): Task<Unit> {
+        fun loginAsync(
+            loginFragment: LoginFragment,
+            cancellationToken: CancellationToken
+        ): Task<Unit> {
 
             val state = loginFragment.getState()
             return Task.call({
-                state.isTaskStarted = true
+                state?.isTaskStarted = true
                 loginFragment.displayState()
             }, Task.UI_THREAD_EXECUTOR).onSuccess(get_token@{
                 if (cancellationToken.isCancellationRequested) {
                     throw CancellationException()
                 }
 
-                if (state.token == null) {
+                if (state?.token == null && state != null) {
                     val loginModel = LoginModel(state.email, state.password)
                     state.token = getToken(loginModel)
                 }
-                return@get_token state.token!!
+                return@get_token state?.token
             }, Task.BACKGROUND_EXECUTOR).onSuccessTask {
-                ProfileTaskProvider.loadProfileAsync(it.result, loginFragment, cancellationToken)
+                it.result?.let { it1 ->
+                    ProfileTaskProvider.loadProfileAsync(
+                        it1,
+                        loginFragment,
+                        cancellationToken
+                    )
+                }
             }.continueWith(finish@{
-                state.isTaskStarted = false
+                state?.isTaskStarted = false
 
-                if (it.isFaulted) {
+                if (it.isFaulted && state != null) {
                     when (it.error) {
                         is SocketTimeoutException -> {
                             state.errorText = loginFragment.getString(R.string.error_connection)
@@ -80,7 +89,7 @@ class LoginTaskProvider {
                 if (!response.isSuccessful) throw IOException()
 
                 if (response.body != null) {
-                    val jsonData: String = response.body!!.string()
+                    val jsonData: String? = response.body?.string()
                     val responseModel =
                         gson.fromJson(jsonData, ResponseModel::class.java)
                     if (responseModel.status == STATUS_ERROR) {

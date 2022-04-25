@@ -7,17 +7,16 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import java.io.Serializable
 import java.lang.ClassCastException
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
-import android.widget.Toast
+import bolts.CancellationTokenSource
 import bolts.Task
 import com.example.emptyproject.MainActivity
 import com.example.emptyproject.Profile
 import com.example.emptyproject.R
-import com.example.emptyproject.providers.LoginTaskProvider
-import com.example.emptyproject.providers.ProfileTaskProvider
+import com.example.emptyproject.State
+import com.example.emptyproject.providers.UpdateProfileProvider
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -28,14 +27,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private var textViewNotes: TextView? = null
     private var buttonLogout: Button? = null
     private var clickLogoutListener: OnSendClickLogout? = null
-    private var profile: Profile? = null
     private var pullToRefresh: SwipeRefreshLayout? = null
+    private var state: State? = null
+    private var updateProfileTask: Task<Unit>? = null
+    private var cancellationTokenSource: CancellationTokenSource? = null
 
     companion object {
 
-        fun newInstance(profile: Serializable): Fragment {
+        fun newInstance(state: State): Fragment {
             val args = Bundle()
-            args.putSerializable(MainActivity.PROFILE, profile)
+            args.putSerializable(MainActivity.STATE, state)
             val profileFragment = ProfileFragment()
                 profileFragment.arguments = args
             return profileFragment
@@ -59,28 +60,29 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         super.onViewCreated(view, savedInstanceState)
 
         initializeFields(view)
+        cancellationTokenSource = CancellationTokenSource()
 
         val buttonLogout = buttonLogout ?: return
-        val pullToRefresh = pullToRefresh ?: return
-        profile = arguments?.getSerializable(MainActivity.PROFILE) as Profile
 
-        if (profile != null) {
-            displayProfile(profile!!)
-        } else {
+        state = arguments?.getSerializable(MainActivity.STATE) as State
 
+        val state = state ?: return
+
+        if (state.profile != null) {
+            displayProfile(state.profile!!)
         }
 
         buttonLogout.setOnClickListener {
             clickLogoutListener?.clickLogout()
         }
 
-        pullToRefresh.setOnRefreshListener(OnRefreshListener {
-            Toast.makeText(activity?.applicationContext, "Works!", Toast.LENGTH_LONG).show();
-            // To keep animation for 4 seconds
-            Handler().postDelayed({ // Stop animation (This will be after 3 seconds)
-                pullToRefresh.isRefreshing = false
-            }, 4000) // Delay in millis
-        })
+        setRefreshListener()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val cancellationTokenSource = cancellationTokenSource ?: return
+        cancellationTokenSource.cancel()
     }
 
     private fun initializeFields(view: View) {
@@ -105,5 +107,19 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         textViewLastName.text = profile.lastName
         textViewBirthDate.text = profile.birthDate
         textViewNotes.text = profile.notes
+    }
+
+    private fun setRefreshListener() {
+        val state = state ?: return
+        val cancellationTokenSource = cancellationTokenSource ?: return
+        val pullToRefresh = pullToRefresh ?: return
+        pullToRefresh.setOnRefreshListener(OnRefreshListener {
+            updateProfileTask =
+                UpdateProfileProvider.updateProfileAsync(state, cancellationTokenSource.token)
+                    .onSuccess { state.profile?.let { it -> displayProfile(it) } }
+            Handler().postDelayed({
+                pullToRefresh.isRefreshing = false
+            }, 2000)
+        })
     }
 }

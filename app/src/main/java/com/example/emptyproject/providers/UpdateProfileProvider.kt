@@ -4,9 +4,7 @@ import bolts.CancellationToken
 import bolts.Task
 import com.example.emptyproject.Profile
 import com.example.emptyproject.State
-import com.example.emptyproject.fragments.LoginFragment
 import com.example.emptyproject.fragments.TOKEN
-import com.example.emptyproject.fragments.URL
 import com.example.emptyproject.models.ProfileModel
 import com.example.emptyproject.models.ResponseModel
 import com.google.gson.Gson
@@ -22,32 +20,32 @@ const val URL_NEW = "httpS://pub.zame-dev.org/senla-training-addition/lesson-21.
 
 class UpdateProfileProvider {
 
-    val updateProfile: Task<Unit>? = null
-
     companion object {
-        fun updateProfileAsync(token: String, loginFragment: LoginFragment, cancellationToken: CancellationToken): Task<Unit> {
-            val state = loginFragment.getState()
+        fun updateProfileAsync(state: State, cancellationToken: CancellationToken): Task<Unit> {
 
             return Task.callInBackground {
                 if (cancellationToken.isCancellationRequested) {
                     throw LoginTaskProvider.CancellationException()
                 }
-                getProfile(token, state)
-            }.onSuccess({
-                if (cancellationToken.isCancellationRequested) {
-                    throw LoginTaskProvider.CancellationException()
-                }
-                loginFragment.dataSendListener!!.sendProfile(it.result)
-            }, Task.UI_THREAD_EXECUTOR)
+                state.profile = state.token?.let { getProfile(it, state) }
+            }
         }
 
         private fun getProfile(token: String, state: State): Profile {
+            val tokenObject = createTokenObject(token)
+
+            return sendProfileRequest(tokenObject, state)
+        }
+
+        private fun createTokenObject(token: String): JSONObject {
             val jsonTokenObject = JSONObject()
             jsonTokenObject.put(TOKEN, token)
-            jsonTokenObject.toString()
+            return jsonTokenObject
+        }
 
+        private fun sendProfileRequest(tokenObject: JSONObject, state: State): Profile {
             val client = OkHttpClient()
-            val requestBody = jsonTokenObject.toString().toRequestBody()
+            val requestBody = tokenObject.toString().toRequestBody()
             val request = Request.Builder()
                 .method("POST", requestBody)
                 .url(URL_NEW + "profile")
@@ -56,7 +54,7 @@ class UpdateProfileProvider {
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
                 if (response.body != null) {
-                    val jsonData: String = response.body!!.string()
+                    val jsonData: String? = response.body?.string()
                     val gson = Gson()
                     val profileModel = gson.fromJson(jsonData, ProfileModel::class.java)
                     if (profileModel.status == STATUS_OK) {
@@ -70,7 +68,6 @@ class UpdateProfileProvider {
                     }
                 }
             }
-
             throw ProfileException("Error: ")
         }
 

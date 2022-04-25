@@ -3,6 +3,7 @@ package com.example.emptyproject
 import java.io.Serializable
 
 class State(
+    var profile: Profile? = null,
     var email: String = "",
     var password: String = "",
     var errorText: String = "",

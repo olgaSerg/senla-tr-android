@@ -20,29 +20,41 @@ import java.util.Date
 
 class ProfileTaskProvider {
     companion object {
-        fun loadProfileAsync(token: String, loginFragment: LoginFragment, cancellationToken: CancellationToken): Task<Unit> {
+        fun loadProfileAsync(
+            token: String,
+            loginFragment: LoginFragment,
+            cancellationToken: CancellationToken
+        ): Task<Unit> {
             val state = loginFragment.getState()
 
             return Task.callInBackground {
                 if (cancellationToken.isCancellationRequested) {
                     throw LoginTaskProvider.CancellationException()
                 }
-                getProfile(token, state)
+                state?.let { getProfile(token, it) }
             }.onSuccess({
                 if (cancellationToken.isCancellationRequested) {
                     throw LoginTaskProvider.CancellationException()
                 }
-                loginFragment.dataSendListener!!.sendProfile(it.result)
+                loginFragment.dataSendListener?.sendProfile(it.result)
+                state?.profile = it.result
             }, Task.UI_THREAD_EXECUTOR)
         }
 
         private fun getProfile(token: String, state: State): Profile {
+            val tokenObject = createTokenObject(token)
+            return sendProfileRequest(tokenObject, state)
+        }
+
+        private fun createTokenObject(token: String): JSONObject {
             val jsonTokenObject = JSONObject()
             jsonTokenObject.put(TOKEN, token)
-            jsonTokenObject.toString()
+            return jsonTokenObject
+        }
 
+        private fun sendProfileRequest(tokenObject: JSONObject, state: State): Profile {
             val client = OkHttpClient()
-            val requestBody = jsonTokenObject.toString().toRequestBody()
+            val requestBody = tokenObject.toString().toRequestBody()
             val request = Request.Builder()
                 .method("POST", requestBody)
                 .url(URL + "profile")
@@ -51,7 +63,7 @@ class ProfileTaskProvider {
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
                 if (response.body != null) {
-                    val jsonData: String = response.body!!.string()
+                    val jsonData: String? = response.body?.string()
                     val gson = Gson()
                     val profileModel = gson.fromJson(jsonData, ProfileModel::class.java)
                     if (profileModel.status == STATUS_OK) {
@@ -60,8 +72,8 @@ class ProfileTaskProvider {
                     } else {
                         val responseModel =
                             gson.fromJson(jsonData, ResponseModel::class.java)
-                            val jsonMessage = responseModel.message
-                            throw ProfileException("Error: $jsonMessage")
+                        val jsonMessage = responseModel.message
+                        throw ProfileException("Error: $jsonMessage")
                     }
                 }
             }
