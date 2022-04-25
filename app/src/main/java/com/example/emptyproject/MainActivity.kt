@@ -2,8 +2,9 @@ package com.example.emptyproject
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
 import androidx.fragment.app.Fragment
+import com.example.emptyproject.fragments.LoginFragment
+import com.example.emptyproject.fragments.ProfileFragment
 import java.io.Serializable
 
 class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,

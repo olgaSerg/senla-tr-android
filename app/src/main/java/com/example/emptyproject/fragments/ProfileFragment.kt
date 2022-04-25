@@ -1,7 +1,6 @@
-package com.example.emptyproject
+package com.example.emptyproject.fragments
 
 import android.app.Activity
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -13,6 +12,12 @@ import java.lang.ClassCastException
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import android.widget.Toast
+import bolts.Task
+import com.example.emptyproject.MainActivity
+import com.example.emptyproject.Profile
+import com.example.emptyproject.R
+import com.example.emptyproject.providers.LoginTaskProvider
+import com.example.emptyproject.providers.ProfileTaskProvider
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -70,7 +75,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
 
         pullToRefresh.setOnRefreshListener(OnRefreshListener {
-            // Your code here
             Toast.makeText(activity?.applicationContext, "Works!", Toast.LENGTH_LONG).show();
             // To keep animation for 4 seconds
             Handler().postDelayed({ // Stop animation (This will be after 3 seconds)

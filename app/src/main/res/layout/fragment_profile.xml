@@ -4,157 +4,158 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileFragment">
+    tools:context=".fragments.ProfileFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="70dp">
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nested_scroll_iew"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/constraint_layout_bottom"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <ScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true">
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@id/constraint_layout_bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/text_view_notes_title"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="20dp"
-                android:text="@string/notes"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_view_birth_date_title" />
+                android:fitsSystemWindows="true">
 
-            <TextView
-                android:id="@+id/text_view_notes"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:padding="20dp"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_view_notes_title" />
+                <TextView
+                    android:id="@+id/text_view_notes_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:text="@string/notes"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_birth_date_title" />
+
+                <TextView
+                    android:id="@+id/text_view_notes"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_notes_title" />
 
 
-            <TextView
-                android:id="@+id/text_view_birth_date_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
-                android:text="@string/birth_date"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintEnd_toStartOf="@id/text_view_birth_date"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_view_last_name_title" />
+                <TextView
+                    android:id="@+id/text_view_birth_date_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:text="@string/birth_date"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintEnd_toStartOf="@id/text_view_birth_date"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_last_name_title" />
 
-            <TextView
-                android:id="@+id/text_view_birth_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:padding="20dp"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="2"
-                app:layout_constraintStart_toEndOf="@id/text_view_birth_date_title"
-                app:layout_constraintTop_toBottomOf="@id/text_view_last_name" />
+                <TextView
+                    android:id="@+id/text_view_birth_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toEndOf="@id/text_view_birth_date_title"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_last_name" />
 
-            <TextView
-                android:id="@+id/text_view_last_name_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
-                android:text="@string/last_name"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintEnd_toStartOf="@id/text_view_last_name"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_view_first_name_title" />
+                <TextView
+                    android:id="@+id/text_view_last_name_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:text="@string/last_name"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintEnd_toStartOf="@id/text_view_last_name"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_first_name_title" />
 
-            <TextView
-                android:id="@+id/text_view_last_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:padding="20dp"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintBottom_toTopOf="@id/text_view_birth_date"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="2"
-                app:layout_constraintStart_toEndOf="@id/text_view_last_name_title"
-                app:layout_constraintTop_toBottomOf="@id/text_view_first_name" />
+                <TextView
+                    android:id="@+id/text_view_last_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintBottom_toTopOf="@id/text_view_birth_date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toEndOf="@id/text_view_last_name_title"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_first_name" />
 
-            <TextView
-                android:id="@+id/text_view_first_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:padding="20dp"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="2"
-                app:layout_constraintStart_toEndOf="@id/text_view_first_name_title"
-                app:layout_constraintTop_toBottomOf="@id/text_view_email" />
+                <TextView
+                    android:id="@+id/text_view_first_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toEndOf="@id/text_view_first_name_title"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_email" />
 
-            <TextView
-                android:id="@+id/text_view_first_name_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
-                android:text="@string/first_name"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintEnd_toStartOf="@id/text_view_first_name"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_view_email_title" />
+                <TextView
+                    android:id="@+id/text_view_first_name_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:text="@string/first_name"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintEnd_toStartOf="@id/text_view_first_name"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_email_title" />
 
-            <TextView
-                android:id="@+id/text_view_email_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
-                android:text="@string/email_title"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintEnd_toStartOf="@id/text_view_email"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/text_view_email_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:text="@string/email_title"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintEnd_toStartOf="@id/text_view_email"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/text_view_email"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:padding="20dp"
-                android:textSize="@dimen/profile_fragment_text_size"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="2"
-                app:layout_constraintStart_toEndOf="@id/text_view_email_title"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+                <TextView
+                    android:id="@+id/text_view_email"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="@dimen/profile_fragment_text_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toEndOf="@id/text_view_email_title"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nested_scroll_iew">
+        app:layout_constraintTop_toBottomOf="@id/swipe_container">
 
         <Button
             android:id="@+id/button_logout"
@@ -171,5 +172,5 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
