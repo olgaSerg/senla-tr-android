@@ -21,92 +21,91 @@ const val STATUS_ERROR = "error"
 
 class LoginTaskProvider {
 
-    companion object {
-        fun loginAsync(
-            loginFragment: LoginFragment,
-            cancellationToken: CancellationToken
-        ): Task<Unit> {
+    fun loginAsync(
+        loginFragment: LoginFragment,
+        cancellationToken: CancellationToken
+    ): Task<Unit> {
 
-            val state = loginFragment.getState()
-            return Task.call({
-                state?.isTaskStarted = true
-                loginFragment.displayState()
-            }, Task.UI_THREAD_EXECUTOR).onSuccess(get_token@{
-                if (cancellationToken.isCancellationRequested) {
-                    throw CancellationException()
-                }
+        val state = loginFragment.getState()
+        return Task.call({
+            state?.isTaskStarted = true
+            loginFragment.displayState()
+        }, Task.UI_THREAD_EXECUTOR).onSuccess(get_token@{
+            if (cancellationToken.isCancellationRequested) {
+                throw CancellationException()
+            }
 
-                if (state?.token == null && state != null) {
-                    val loginModel = LoginModel(state.email, state.password)
-                    state.token = getToken(loginModel)
-                }
-                return@get_token state?.token
-            }, Task.BACKGROUND_EXECUTOR).onSuccessTask {
-                it.result?.let { it1 ->
-                    ProfileTaskProvider.loadProfileAsync(
-                        it1,
-                        loginFragment,
-                        cancellationToken
-                    )
-                }
-            }.continueWith(finish@{
-                state?.isTaskStarted = false
+            if (state?.token == null && state != null) {
+                val loginModel = LoginModel(state.email, state.password)
+                state.token = getToken(loginModel)
+            }
+            return@get_token state?.token
+        }, Task.BACKGROUND_EXECUTOR).onSuccessTask {
+            it.result?.let { token ->
+                val profileTaskProvider = ProfileTaskProvider()
+                profileTaskProvider.loadProfileAsync(
+                    token,
+                    loginFragment,
+                    cancellationToken
+                )
+            }
+        }.continueWith(finish@{
+            state?.isTaskStarted = false
 
-                if (it.isFaulted && state != null) {
-                    when (it.error) {
-                        is SocketTimeoutException -> {
-                            state.errorText = loginFragment.getString(R.string.error_connection)
-                        }
-                        is IOException -> {
-                            state.errorText = loginFragment.getString(R.string.error_message)
-                        }
-                        is LoginException -> {
-                            state.errorText = it.error.message.toString()
-                        }
-                        is ProfileTaskProvider.ProfileException -> {
-                            state.errorText = it.error.message.toString()
-                        }
-                        is CancellationException -> {
-                            return@finish
-                        }
+            if (it.isFaulted && state != null) {
+                when (it.error) {
+                    is SocketTimeoutException -> {
+                        state.errorText = loginFragment.getString(R.string.error_connection)
                     }
-                }
-                loginFragment.displayState()
-            }, Task.UI_THREAD_EXECUTOR)
-        }
-
-        private fun getToken(loginModel: LoginModel): String {
-            val gson = Gson()
-            val loginModelGson = gson.toJson(loginModel)
-
-            val client = OkHttpClient()
-            val requestBody = loginModelGson.toRequestBody()
-            val request = Request.Builder()
-                .method("POST", requestBody)
-                .url(URL + "login")
-                .build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException()
-
-                if (response.body != null) {
-                    val jsonData: String? = response.body?.string()
-                    val responseModel =
-                        gson.fromJson(jsonData, ResponseModel::class.java)
-                    if (responseModel.status == STATUS_ERROR) {
-                        val jsonMessage = responseModel.message
-                        throw LoginException("Error: $jsonMessage")
+                    is IOException -> {
+                        state.errorText = loginFragment.getString(R.string.error_message)
                     }
-
-                    if (responseModel.status == STATUS_OK) {
-                        val jsonObject = JSONObject(jsonData)
-                        return jsonObject.getString(TOKEN)
-
+                    is LoginException -> {
+                        state.errorText = it.error.message.toString()
+                    }
+                    is ProfileTaskProvider.ProfileException -> {
+                        state.errorText = it.error.message.toString()
+                    }
+                    is CancellationException -> {
+                        return@finish
                     }
                 }
             }
+            loginFragment.displayState()
+        }, Task.UI_THREAD_EXECUTOR)
+    }
 
-            throw LoginException("Error: ")
+    private fun getToken(loginModel: LoginModel): String {
+        val gson = Gson()
+        val loginModelGson = gson.toJson(loginModel)
+
+        val client = OkHttpClient()
+        val requestBody = loginModelGson.toRequestBody()
+        val request = Request.Builder()
+            .method("POST", requestBody)
+            .url(URL + "login")
+            .build()
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException()
+
+            if (response.body != null) {
+                val jsonData: String? = response.body?.string()
+                val responseModel =
+                    gson.fromJson(jsonData, ResponseModel::class.java)
+                if (responseModel.status == STATUS_ERROR) {
+                    val jsonMessage = responseModel.message
+                    throw LoginException("Error: $jsonMessage")
+                }
+
+                if (responseModel.status == STATUS_OK) {
+                    val jsonObject = JSONObject(jsonData)
+                    return jsonObject.getString(TOKEN)
+
+                }
+            }
         }
+
+        throw LoginException("Error: ")
     }
 
     class LoginException(message: String) : Exception(message) {}

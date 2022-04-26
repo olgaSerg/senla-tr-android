@@ -20,72 +20,70 @@ const val URL_NEW = "httpS://pub.zame-dev.org/senla-training-addition/lesson-21.
 
 class UpdateProfileProvider {
 
-    companion object {
-        fun updateProfileAsync(state: State, cancellationToken: CancellationToken): Task<Unit> {
+    fun updateProfileAsync(state: State, cancellationToken: CancellationToken): Task<Unit> {
 
-            return Task.callInBackground {
-                if (cancellationToken.isCancellationRequested) {
-                    throw LoginTaskProvider.CancellationException()
-                }
-                state.profile = state.token?.let { getProfile(it, state) }
+        return Task.callInBackground {
+            if (cancellationToken.isCancellationRequested) {
+                throw LoginTaskProvider.CancellationException()
             }
+            state.profile = state.token?.let { getProfile(it, state) }
         }
+    }
 
-        private fun getProfile(token: String, state: State): Profile {
-            val tokenObject = createTokenObject(token)
+    private fun getProfile(token: String, state: State): Profile {
+        val tokenObject = createTokenObject(token)
 
-            return sendProfileRequest(tokenObject, state)
-        }
+        return sendProfileRequest(tokenObject, state)
+    }
 
-        private fun createTokenObject(token: String): JSONObject {
-            val jsonTokenObject = JSONObject()
-            jsonTokenObject.put(TOKEN, token)
-            return jsonTokenObject
-        }
+    private fun createTokenObject(token: String): JSONObject {
+        val jsonTokenObject = JSONObject()
+        jsonTokenObject.put(TOKEN, token)
+        return jsonTokenObject
+    }
 
-        private fun sendProfileRequest(tokenObject: JSONObject, state: State): Profile {
-            val client = OkHttpClient()
-            val requestBody = tokenObject.toString().toRequestBody()
-            val request = Request.Builder()
-                .method("POST", requestBody)
-                .url(URL_NEW + "profile")
-                .build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+    private fun sendProfileRequest(tokenObject: JSONObject, state: State): Profile {
+        val client = OkHttpClient()
+        val requestBody = tokenObject.toString().toRequestBody()
+        val request = Request.Builder()
+            .method("POST", requestBody)
+            .url(URL_NEW + "profile")
+            .build()
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                if (response.body != null) {
-                    val jsonData: String? = response.body?.string()
-                    val gson = Gson()
-                    val profileModel = gson.fromJson(jsonData, ProfileModel::class.java)
-                    if (profileModel.status == STATUS_OK) {
+            if (response.body != null) {
+                val jsonData: String? = response.body?.string()
+                val gson = Gson()
+                val profileModel = gson.fromJson(jsonData, ProfileModel::class.java)
+                if (profileModel.status == STATUS_OK) {
 
-                        return fillProfileObject(profileModel, state.email)
-                    } else {
-                        val responseModel =
-                            gson.fromJson(jsonData, ResponseModel::class.java)
-                        val jsonMessage = responseModel.message
-                        throw ProfileException("Error: $jsonMessage")
-                    }
+                    return fillProfileObject(profileModel, state.email)
+                } else {
+                    val responseModel =
+                        gson.fromJson(jsonData, ResponseModel::class.java)
+                    val jsonMessage = responseModel.message
+                    throw ProfileException("Error: $jsonMessage")
                 }
             }
-            throw ProfileException("Error: ")
         }
+        throw ProfileException("Error: ")
+    }
 
-        private fun fillProfileObject(profileModel: ProfileModel, email: String): Profile {
-            return Profile(
-                email = email,
-                firstName = profileModel.firstName,
-                lastName = profileModel.lastName,
-                birthDate = getBirthDateFormatted(profileModel.birthDate),
-                notes = profileModel.notes
-            )
-        }
+    private fun fillProfileObject(profileModel: ProfileModel, email: String): Profile {
+        return Profile(
+            email = email,
+            firstName = profileModel.firstName,
+            lastName = profileModel.lastName,
+            birthDate = getBirthDateFormatted(profileModel.birthDate),
+            notes = profileModel.notes
+        )
+    }
 
-        private fun getBirthDateFormatted(birthDate: Int): String {
-            val date = Date(birthDate * 1000L)
-            val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
-            return dateFormat.format(date)
-        }
+    private fun getBirthDateFormatted(birthDate: Int): String {
+        val date = Date(birthDate * 1000L)
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+        return dateFormat.format(date)
     }
 
     class ProfileException(message: String) : Exception(message) {}

@@ -19,83 +19,83 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 class ProfileTaskProvider {
-    companion object {
-        fun loadProfileAsync(
-            token: String,
-            loginFragment: LoginFragment,
-            cancellationToken: CancellationToken
-        ): Task<Unit> {
-            val state = loginFragment.getState()
 
-            return Task.callInBackground {
-                if (cancellationToken.isCancellationRequested) {
-                    throw LoginTaskProvider.CancellationException()
-                }
-                state?.let { getProfile(token, it) }
-            }.onSuccess({
-                if (cancellationToken.isCancellationRequested) {
-                    throw LoginTaskProvider.CancellationException()
-                }
-                loginFragment.dataSendListener?.sendProfile(it.result)
-                state?.profile = it.result
-            }, Task.UI_THREAD_EXECUTOR)
-        }
+    fun loadProfileAsync(
+        token: String,
+        loginFragment: LoginFragment,
+        cancellationToken: CancellationToken
+    ): Task<Unit> {
+        val state = loginFragment.getState()
 
-        private fun getProfile(token: String, state: State): Profile {
-            val tokenObject = createTokenObject(token)
-            return sendProfileRequest(tokenObject, state)
-        }
+        return Task.callInBackground {
+            if (cancellationToken.isCancellationRequested) {
+                throw LoginTaskProvider.CancellationException()
+            }
+            state?.let { getProfile(token, it) }
+        }.onSuccess({
+            if (cancellationToken.isCancellationRequested) {
+                throw LoginTaskProvider.CancellationException()
+            }
+            loginFragment.dataSendListener?.sendProfile(it.result)
+            state?.profile = it.result
+        }, Task.UI_THREAD_EXECUTOR)
+    }
 
-        private fun createTokenObject(token: String): JSONObject {
-            val jsonTokenObject = JSONObject()
-            jsonTokenObject.put(TOKEN, token)
-            return jsonTokenObject
-        }
+    private fun getProfile(token: String, state: State): Profile {
+        val tokenObject = createTokenObject(token)
+        return sendProfileRequest(tokenObject, state)
+    }
 
-        private fun sendProfileRequest(tokenObject: JSONObject, state: State): Profile {
-            val client = OkHttpClient()
-            val requestBody = tokenObject.toString().toRequestBody()
-            val request = Request.Builder()
-                .method("POST", requestBody)
-                .url(URL + "profile")
-                .build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+    private fun createTokenObject(token: String): JSONObject {
+        val jsonTokenObject = JSONObject()
+        jsonTokenObject.put(TOKEN, token)
+        return jsonTokenObject
+    }
 
-                if (response.body != null) {
-                    val jsonData: String? = response.body?.string()
-                    val gson = Gson()
-                    val profileModel = gson.fromJson(jsonData, ProfileModel::class.java)
-                    if (profileModel.status == STATUS_OK) {
+    private fun sendProfileRequest(tokenObject: JSONObject, state: State): Profile {
+        val client = OkHttpClient()
+        val requestBody = tokenObject.toString().toRequestBody()
+        val request = Request.Builder()
+            .method("POST", requestBody)
+            .url(URL + "profile")
+            .build()
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                        return fillProfileObject(profileModel, state.email)
-                    } else {
-                        val responseModel =
-                            gson.fromJson(jsonData, ResponseModel::class.java)
-                        val jsonMessage = responseModel.message
-                        throw ProfileException("Error: $jsonMessage")
-                    }
+            if (response.body != null) {
+                val jsonData: String? = response.body?.string()
+                val gson = Gson()
+                val profileModel = gson.fromJson(jsonData, ProfileModel::class.java)
+                if (profileModel.status == STATUS_OK) {
+
+                    return fillProfileObject(profileModel, state.email)
+                } else {
+                    val responseModel =
+                        gson.fromJson(jsonData, ResponseModel::class.java)
+                    val jsonMessage = responseModel.message
+                    throw ProfileException("Error: $jsonMessage")
                 }
             }
-            throw ProfileException("Error: ")
         }
-
-        private fun fillProfileObject(profileModel: ProfileModel, email: String): Profile {
-            return Profile(
-                email = email,
-                firstName = profileModel.firstName,
-                lastName = profileModel.lastName,
-                birthDate = getBirthDateFormatted(profileModel.birthDate),
-                notes = profileModel.notes
-            )
-        }
-
-        private fun getBirthDateFormatted(birthDate: Int): String {
-            val date = Date(birthDate * 1000L)
-            val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
-            return dateFormat.format(date)
-        }
+        throw ProfileException("Error: ")
     }
+
+    private fun fillProfileObject(profileModel: ProfileModel, email: String): Profile {
+        return Profile(
+            email = email,
+            firstName = profileModel.firstName,
+            lastName = profileModel.lastName,
+            birthDate = getBirthDateFormatted(profileModel.birthDate),
+            notes = profileModel.notes
+        )
+    }
+
+    private fun getBirthDateFormatted(birthDate: Int): String {
+        val date = Date(birthDate * 1000L)
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+        return dateFormat.format(date)
+    }
+
 
     class ProfileException(message: String) : Exception(message) {}
 }

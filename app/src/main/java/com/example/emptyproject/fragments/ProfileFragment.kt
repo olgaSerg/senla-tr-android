@@ -114,8 +114,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val cancellationTokenSource = cancellationTokenSource ?: return
         val pullToRefresh = pullToRefresh ?: return
         pullToRefresh.setOnRefreshListener(OnRefreshListener {
+            val updateProfileProvider = UpdateProfileProvider()
             updateProfileTask =
-                UpdateProfileProvider.updateProfileAsync(state, cancellationTokenSource.token)
+                updateProfileProvider.updateProfileAsync(state, cancellationTokenSource.token)
                     .onSuccess { state.profile?.let { it -> displayProfile(it) } }
             Handler().postDelayed({
                 pullToRefresh.isRefreshing = false

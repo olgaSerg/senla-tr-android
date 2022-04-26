@@ -145,7 +145,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             cancellationTokenSource = CancellationTokenSource()
 
             if (cancellationTokenSource != null) {
-                loginTask = LoginTaskProvider.loginAsync(this, cancellationTokenSource!!.token)
+                val loginTaskProvider = LoginTaskProvider()
+                loginTask = loginTaskProvider.loginAsync(this, cancellationTokenSource!!.token)
             }
         }
     }
