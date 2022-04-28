@@ -1,10 +1,16 @@
 package com.example.emptyproject.models
 
+import com.google.gson.annotations.SerializedName
+
 class ProfileModel(
+    @SerializedName("status")
     val status: String,
-    val email: String,
+    @SerializedName("firstName")
     val firstName: String,
+    @SerializedName("lastName")
     val lastName: String,
+    @SerializedName("birthDate")
     val birthDate: Int,
+    @SerializedName("notes")
     val notes: String
 ) {}

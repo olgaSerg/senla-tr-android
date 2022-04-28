@@ -1,6 +1,10 @@
 package com.example.emptyproject.models
 
+import com.google.gson.annotations.SerializedName
+
 data class LoginModel(
-    val email: String,
-    val password: String
+    @SerializedName("email")
+    val userEmail: String,
+    @SerializedName("password")
+    val userPassword: String
 ) {}

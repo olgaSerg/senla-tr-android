@@ -1,25 +1,25 @@
 package com.example.emptyproject.providers
 
+import android.util.Log
 import bolts.CancellationToken
 import bolts.Task
+import com.example.emptyproject.ApiInterface
 import com.example.emptyproject.R
 import com.example.emptyproject.fragments.LoginFragment
-import com.example.emptyproject.fragments.TOKEN
-import com.example.emptyproject.fragments.URL
 import com.example.emptyproject.models.LoginModel
-import com.example.emptyproject.models.ResponseModel
-import com.google.gson.Gson
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
+import com.example.emptyproject.models.TokenResponse
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.net.SocketTimeoutException
 
 const val STATUS_OK = "ok"
 const val STATUS_ERROR = "error"
+const val BASE_URL = "https://pub.zame-dev.org"
 
-class LoginTaskProvider {
+class LoginTaskProvider() {
 
     fun loginAsync(
         loginFragment: LoginFragment,
@@ -34,7 +34,6 @@ class LoginTaskProvider {
             if (cancellationToken.isCancellationRequested) {
                 throw CancellationException()
             }
-
             if (state?.token == null && state != null) {
                 val loginModel = LoginModel(state.email, state.password)
                 state.token = getToken(loginModel)
@@ -76,36 +75,27 @@ class LoginTaskProvider {
     }
 
     private fun getToken(loginModel: LoginModel): String {
-        val gson = Gson()
-        val loginModelGson = gson.toJson(loginModel)
-
-        val client = OkHttpClient()
-        val requestBody = loginModelGson.toRequestBody()
-        val request = Request.Builder()
-            .method("POST", requestBody)
-            .url(URL + "login")
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException()
 
-            if (response.body != null) {
-                val jsonData: String? = response.body?.string()
-                val responseModel =
-                    gson.fromJson(jsonData, ResponseModel::class.java)
-                if (responseModel.status == STATUS_ERROR) {
-                    val jsonMessage = responseModel.message
-                    throw LoginException("Error: $jsonMessage")
-                }
+        val apiService: ApiInterface = retrofit.create(ApiInterface::class.java)
+        val call: Call<TokenResponse> = apiService.sendTokenRequest(loginModel)
+        val response: Response<TokenResponse> = call.execute()
+        if (!response.isSuccessful) throw IOException()
 
-                if (responseModel.status == STATUS_OK) {
-                    val jsonObject = JSONObject(jsonData)
-                    return jsonObject.getString(TOKEN)
+        if (response.body() != null) {
+            if (response.body()?.status == STATUS_ERROR) {
+                throw LoginException("Error: ${response.body()?.message}")
+            }
 
-                }
+            if (response.body()?.status == STATUS_OK) {
+                return response.body()?.token.toString()
             }
         }
-
-        throw LoginException("Error: ")
+        Log.v("!!", response.body().toString())
+        throw LoginException("Error: ${response.body()?.message}")
     }
 
     class LoginException(message: String) : Exception(message) {}

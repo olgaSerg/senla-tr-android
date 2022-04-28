@@ -7,21 +7,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
-import java.io.Serializable
 import android.app.Activity
 import androidx.core.widget.addTextChangedListener
 import bolts.Task
 import java.lang.ClassCastException
-import java.util.*
 import bolts.CancellationTokenSource
-import com.example.emptyproject.MainActivity
-import com.example.emptyproject.Profile
 import com.example.emptyproject.R
 import com.example.emptyproject.State
+import com.example.emptyproject.MainActivity
+import com.example.emptyproject.Profile
 import com.example.emptyproject.providers.LoginTaskProvider
-
-const val URL = "https://pub.zame-dev.org/senla-training-addition/lesson-20.php?method="
-const val TOKEN = "token"
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 

@@ -38,7 +38,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             val args = Bundle()
             args.putSerializable(MainActivity.STATE, state)
             val profileFragment = ProfileFragment()
-                profileFragment.arguments = args
+            profileFragment.arguments = args
             return profileFragment
         }
     }

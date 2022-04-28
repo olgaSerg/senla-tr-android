@@ -2,18 +2,16 @@ package com.example.emptyproject.providers
 
 import bolts.CancellationToken
 import bolts.Task
+import com.example.emptyproject.ApiInterface
 import com.example.emptyproject.Profile
 import com.example.emptyproject.State
 import com.example.emptyproject.fragments.LoginFragment
-import com.example.emptyproject.fragments.TOKEN
-import com.example.emptyproject.fragments.URL
 import com.example.emptyproject.models.ProfileModel
-import com.example.emptyproject.models.ResponseModel
-import com.google.gson.Gson
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
+import com.example.emptyproject.models.TokenRequest
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -42,42 +40,28 @@ class ProfileTaskProvider {
     }
 
     private fun getProfile(token: String, state: State): Profile {
-        val tokenObject = createTokenObject(token)
-        return sendProfileRequest(tokenObject, state)
+        val tokenRequest = TokenRequest(token)
+        return fillProfile(tokenRequest, state)
     }
 
-    private fun createTokenObject(token: String): JSONObject {
-        val jsonTokenObject = JSONObject()
-        jsonTokenObject.put(TOKEN, token)
-        return jsonTokenObject
-    }
-
-    private fun sendProfileRequest(tokenObject: JSONObject, state: State): Profile {
-        val client = OkHttpClient()
-        val requestBody = tokenObject.toString().toRequestBody()
-        val request = Request.Builder()
-            .method("POST", requestBody)
-            .url(URL + "profile")
+    private fun fillProfile(tokenRequest: TokenRequest, state: State): Profile {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+        val apiService: ApiInterface = retrofit.create(ApiInterface::class.java)
+        val call: Call<ProfileModel> = apiService.sendProfileRequest(tokenRequest)
+        val response: Response<ProfileModel> = call.execute()
+        if (!response.isSuccessful) throw IOException()
 
-            if (response.body != null) {
-                val jsonData: String? = response.body?.string()
-                val gson = Gson()
-                val profileModel = gson.fromJson(jsonData, ProfileModel::class.java)
-                if (profileModel.status == STATUS_OK) {
-
-                    return fillProfileObject(profileModel, state.email)
-                } else {
-                    val responseModel =
-                        gson.fromJson(jsonData, ResponseModel::class.java)
-                    val jsonMessage = responseModel.message
-                    throw ProfileException("Error: $jsonMessage")
-                }
+        if (response.body() != null) {
+            if (response.body()?.status == STATUS_OK) {
+                return fillProfileObject(response.body()!!, state.email)
+            } else {
+                throw ProfileException("Error: ProfileException")
             }
         }
-        throw ProfileException("Error: ")
+        throw ProfileException("Error: ProfileException")
     }
 
     private fun fillProfileObject(profileModel: ProfileModel, email: String): Profile {
@@ -95,7 +79,6 @@ class ProfileTaskProvider {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
         return dateFormat.format(date)
     }
-
 
     class ProfileException(message: String) : Exception(message) {}
 }
