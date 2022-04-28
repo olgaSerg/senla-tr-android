@@ -1,4 +1,4 @@
-package com.example.emptyproject
+package com.example.emptyproject.models
 
 import java.io.Serializable
 

@@ -13,9 +13,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import bolts.CancellationTokenSource
 import bolts.Task
 import com.example.emptyproject.MainActivity
-import com.example.emptyproject.Profile
+import com.example.emptyproject.models.Profile
 import com.example.emptyproject.R
-import com.example.emptyproject.State
+import com.example.emptyproject.models.State
 import com.example.emptyproject.providers.UpdateProfileProvider
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {

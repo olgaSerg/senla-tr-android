@@ -3,8 +3,8 @@ package com.example.emptyproject.providers
 import bolts.CancellationToken
 import bolts.Task
 import com.example.emptyproject.ApiInterface
-import com.example.emptyproject.Profile
-import com.example.emptyproject.State
+import com.example.emptyproject.models.Profile
+import com.example.emptyproject.models.State
 import com.example.emptyproject.models.ProfileModel
 import com.example.emptyproject.models.TokenRequest
 import retrofit2.Call

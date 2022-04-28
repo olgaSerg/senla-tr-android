@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.example.emptyproject.fragments.LoginFragment
 import com.example.emptyproject.fragments.ProfileFragment
+import com.example.emptyproject.models.Profile
+import com.example.emptyproject.models.State
 
 private var state: State = State()
 

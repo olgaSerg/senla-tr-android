@@ -13,9 +13,9 @@ import bolts.Task
 import java.lang.ClassCastException
 import bolts.CancellationTokenSource
 import com.example.emptyproject.R
-import com.example.emptyproject.State
+import com.example.emptyproject.models.State
 import com.example.emptyproject.MainActivity
-import com.example.emptyproject.Profile
+import com.example.emptyproject.models.Profile
 import com.example.emptyproject.providers.LoginTaskProvider
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
