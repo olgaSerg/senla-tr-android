@@ -65,9 +65,9 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,
         for (field in fields) {
             field.isAccessible = true
             Log.e("attributes", field.toString())
-            if (field.isAnnotationPresent(TesterAttribute::class.java)) {
-                val annotation = field.getAnnotation(TesterAttribute::class.java)
-                annotation?.toString()?.let { Log.e("annotation", it) }
+            val annotation = field.getAnnotation(TesterAttribute::class.java)
+            if (annotation != null) {
+                Log.e("annotation", annotation.toString())
             }
         }
     }
@@ -77,9 +77,9 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,
         for (method in methods) {
             method.isAccessible = true
             Log.e("methods", method.toString())
-            if (method.isAnnotationPresent(TesterMethod::class.java)) {
-                val annotation = method.getAnnotation(TesterMethod::class.java)
-                annotation?.toString()?.let { Log.e("annotation", it) }
+            val annotation = method.getAnnotation(TesterMethod::class.java)
+            if (annotation != null) {
+                Log.e("annotation", annotation.toString())
             }
         }
     }

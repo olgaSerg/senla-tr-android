@@ -1,8 +1,7 @@
 package com.example.emptyproject
 import android.util.Log
 
-class Tester(@TesterAttribute(info = "Some attribute")
-    private val param: String) {
+class Tester(@field:TesterAttribute(info = "Some attribute") private val param: String) {
 
     protected var protParam = 42
     @TesterMethod(description = "Some public method")
