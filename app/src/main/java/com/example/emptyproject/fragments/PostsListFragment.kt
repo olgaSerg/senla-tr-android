@@ -1,14 +1,16 @@
-package com.example.emptyproject
+package com.example.emptyproject.fragments
 
 import android.app.Activity
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.emptyproject.App
+import com.example.emptyproject.models.Post
+import com.example.emptyproject.PostsListAdapter
+import com.example.emptyproject.R
 
 class PostsListFragment : Fragment(R.layout.fragment_posts_list) {
 

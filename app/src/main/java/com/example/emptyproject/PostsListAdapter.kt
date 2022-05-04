@@ -8,6 +8,8 @@ import android.widget.TextView
 
 
 import androidx.recyclerview.widget.RecyclerView
+import com.example.emptyproject.fragments.PostsListFragment
+import com.example.emptyproject.models.Post
 
 
 class PostsListAdapter(private val posts: List<Post>,

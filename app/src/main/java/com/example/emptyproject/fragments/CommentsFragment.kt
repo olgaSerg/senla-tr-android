@@ -1,11 +1,12 @@
-package com.example.emptyproject
+package com.example.emptyproject.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
+import com.example.emptyproject.App
+import com.example.emptyproject.models.CommentModel
+import com.example.emptyproject.R
 
 class CommentsFragment : Fragment(R.layout.fragment_comments) {
 

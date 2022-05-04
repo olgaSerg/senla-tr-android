@@ -1,4 +1,4 @@
-package com.example.emptyproject
+package com.example.emptyproject.fragments
 
 import android.app.Activity
 import android.os.Bundle
@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import com.example.emptyproject.App
+import com.example.emptyproject.models.PostDetails
+import com.example.emptyproject.R
 
 const val POST_ID = "id"
 
