@@ -19,38 +19,44 @@ import java.util.Date
 class ProfileTaskProvider {
 
     fun loadProfileAsync(
-        token: String,
-        loginFragment: LoginFragment,
-        cancellationToken: CancellationToken
-    ): Task<Unit> {
-        val state = loginFragment.getState()
-
+        state: State,
+        cancellationToken: CancellationToken,
+        refresh: Boolean
+    ): Task<Profile> {
+        var profile = Profile()
         return Task.callInBackground {
             if (cancellationToken.isCancellationRequested) {
-                throw LoginTaskProvider.CancellationException()
+                throw LoginFragment.CancellationException()
             }
-            state?.let { getProfile(token, it) }
+            if (state.token != null) {
+                profile = getProfile(state.token!!, state, refresh)
+            }
+            profile
         }.onSuccess({
             if (cancellationToken.isCancellationRequested) {
-                throw LoginTaskProvider.CancellationException()
+                throw LoginFragment.CancellationException()
             }
-            loginFragment.dataSendListener?.sendProfile(it.result)
-            state?.profile = it.result
-        }, Task.UI_THREAD_EXECUTOR)
+            state.profile = it.result
+            state.profile
+        }, Task.BACKGROUND_EXECUTOR)
     }
 
-    private fun getProfile(token: String, state: State): Profile {
+    private fun getProfile(token: String, state: State, refresh: Boolean): Profile {
         val tokenRequest = TokenRequest(token)
-        return fillProfile(tokenRequest, state)
+        return fillProfile(tokenRequest, state, refresh)
     }
 
-    private fun fillProfile(tokenRequest: TokenRequest, state: State): Profile {
+    private fun fillProfile(tokenRequest: TokenRequest, state: State, refresh: Boolean): Profile {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val apiService: ApiInterface = retrofit.create(ApiInterface::class.java)
-        val call: Call<ProfileModel> = apiService.sendProfileRequest(tokenRequest)
+        val call: Call<ProfileModel> =
+            if (refresh)
+                apiService.refreshProfileRequest(tokenRequest)
+            else
+                apiService.sendProfileRequest(tokenRequest)
         val response: Response<ProfileModel> = call.execute()
         if (!response.isSuccessful) throw IOException()
 

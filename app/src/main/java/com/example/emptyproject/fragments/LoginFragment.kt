@@ -17,6 +17,9 @@ import com.example.emptyproject.models.State
 import com.example.emptyproject.MainActivity
 import com.example.emptyproject.models.Profile
 import com.example.emptyproject.providers.LoginTaskProvider
+import com.example.emptyproject.providers.ProfileTaskProvider
+import java.io.IOException
+import java.net.SocketTimeoutException
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -27,8 +30,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private var progressBar: ProgressBar? = null
     var dataSendListener: OnDataSendListener? = null
     private var state: State? = null
-
-    private var loginTask: Task<Unit>? = null
 
     private var cancellationTokenSource: CancellationTokenSource? = null
 
@@ -99,7 +100,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         progressBar = view.findViewById(R.id.progress_bar)
     }
 
-    fun displayState() {
+    private fun displayState() {
         val textViewError = textViewError ?: return
         val editTextEmail = editTextEmail ?: return
         val editTextPassword = editTextPassword ?: return
@@ -117,11 +118,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             progressBar.visibility = View.GONE
         }
 
-        state.isTaskStarted = !buttonLogin.isEnabled
-    }
-
-    fun getState(): State? {
-        return state
+        buttonLogin.isEnabled = !state.isTaskStarted
     }
 
     private fun setButtonLoginClickListener(button: Button) {
@@ -140,8 +137,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             cancellationTokenSource = CancellationTokenSource()
 
             if (cancellationTokenSource != null) {
-                val loginTaskProvider = LoginTaskProvider()
-                loginTask = loginTaskProvider.loginAsync(this, cancellationTokenSource!!.token)
+                loginAsync()
             }
         }
     }
@@ -158,4 +154,42 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             field.error = getString(R.string.error_empty_field)
         }
     }
+
+    private fun loginAsync() {
+        if (state != null) {
+            Task.call({
+                state!!.isTaskStarted = true
+                displayState()
+            }, Task.UI_THREAD_EXECUTOR).onSuccessTask {
+                val loginTaskProvider = LoginTaskProvider()
+                loginTaskProvider.loginAsync(state!!, cancellationTokenSource!!.token)
+            }.continueWith(finish@{
+                state?.isTaskStarted = false
+                if (it.isFaulted) {
+                    when (it.error) {
+                        is SocketTimeoutException -> {
+                            state?.errorText = getString(R.string.error_connection)
+                        }
+                        is IOException -> {
+                            state?.errorText = getString(R.string.error_message)
+                        }
+                        is LoginException -> {
+                            state?.errorText = it.error.message.toString()
+                        }
+                        is ProfileTaskProvider.ProfileException -> {
+                            state?.errorText = it.error.message.toString()
+                        }
+                        is CancellationException -> {
+                            return@finish
+                        }
+                    }
+                }
+                displayState()
+                dataSendListener?.sendProfile(it.result)
+            }, Task.UI_THREAD_EXECUTOR)
+        }
+    }
+
+    class LoginException(message: String) : Exception(message) {}
+    class CancellationException() : Exception() {}
 }

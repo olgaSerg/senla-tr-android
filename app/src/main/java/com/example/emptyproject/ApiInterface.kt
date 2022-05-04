@@ -21,7 +21,7 @@ interface ApiInterface {
     ): Call<ProfileModel>
 
     @POST("/senla-training-addition/lesson-21.php?method=profile")
-    fun updateProfileRequest(
+    fun refreshProfileRequest(
         @Body tokenRequest: TokenRequest
     ): Call<ProfileModel>
 

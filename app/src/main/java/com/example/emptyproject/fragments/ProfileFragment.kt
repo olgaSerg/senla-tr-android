@@ -2,21 +2,19 @@ package com.example.emptyproject.fragments
 
 import android.app.Activity
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import java.lang.ClassCastException
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import bolts.CancellationTokenSource
 import bolts.Task
 import com.example.emptyproject.MainActivity
 import com.example.emptyproject.models.Profile
 import com.example.emptyproject.R
 import com.example.emptyproject.models.State
-import com.example.emptyproject.providers.UpdateProfileProvider
+import com.example.emptyproject.providers.ProfileTaskProvider
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -113,14 +111,14 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val state = state ?: return
         val cancellationTokenSource = cancellationTokenSource ?: return
         val pullToRefresh = pullToRefresh ?: return
-        pullToRefresh.setOnRefreshListener(OnRefreshListener {
-            val updateProfileProvider = UpdateProfileProvider()
+        pullToRefresh.setOnRefreshListener {
+            val profileTaskProvider = ProfileTaskProvider()
             updateProfileTask =
-                updateProfileProvider.updateProfileAsync(state, cancellationTokenSource.token)
-                    .onSuccess { state.profile?.let { it -> displayProfile(it) } }
-            Handler().postDelayed({
-                pullToRefresh.isRefreshing = false
-            }, 2000)
-        })
+                profileTaskProvider.loadProfileAsync(state, cancellationTokenSource.token, true)
+                    .onSuccess {
+                        displayProfile(it.result)
+                        pullToRefresh.isRefreshing = false
+                    }
+        }
     }
 }
