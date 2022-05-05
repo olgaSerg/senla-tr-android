@@ -2,7 +2,8 @@ package com.example.emptyproject.providers
 
 import bolts.CancellationToken
 import bolts.Task
-import com.example.emptyproject.R
+import com.example.emptyproject.Profile
+import com.example.emptyproject.State
 import com.example.emptyproject.fragments.LoginFragment
 import com.example.emptyproject.fragments.TOKEN
 import com.example.emptyproject.fragments.URL
@@ -14,7 +15,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
-import java.net.SocketTimeoutException
 
 const val STATUS_OK = "ok"
 const val STATUS_ERROR = "error"
@@ -22,58 +22,27 @@ const val STATUS_ERROR = "error"
 class LoginTaskProvider {
 
     fun loginAsync(
-        loginFragment: LoginFragment,
+        state: State,
         cancellationToken: CancellationToken
-    ): Task<Unit> {
-
-        val state = loginFragment.getState()
+    ): Task<Profile> {
         return Task.call({
-            state?.isTaskStarted = true
-            loginFragment.displayState()
-        }, Task.UI_THREAD_EXECUTOR).onSuccess(get_token@{
             if (cancellationToken.isCancellationRequested) {
-                throw CancellationException()
+                throw LoginFragment.CancellationException()
             }
-
-            if (state?.token == null && state != null) {
+            if (state.token == null) {
                 val loginModel = LoginModel(state.email, state.password)
                 state.token = getToken(loginModel)
             }
-            return@get_token state?.token
         }, Task.BACKGROUND_EXECUTOR).onSuccessTask {
-            it.result?.let { token ->
-                val profileTaskProvider = ProfileTaskProvider()
-                profileTaskProvider.loadProfileAsync(
-                    token,
-                    loginFragment,
-                    cancellationToken
-                )
-            }
-        }.continueWith(finish@{
-            state?.isTaskStarted = false
-
-            if (it.isFaulted && state != null) {
-                when (it.error) {
-                    is SocketTimeoutException -> {
-                        state.errorText = loginFragment.getString(R.string.error_connection)
-                    }
-                    is IOException -> {
-                        state.errorText = loginFragment.getString(R.string.error_message)
-                    }
-                    is LoginException -> {
-                        state.errorText = it.error.message.toString()
-                    }
-                    is ProfileTaskProvider.ProfileException -> {
-                        state.errorText = it.error.message.toString()
-                    }
-                    is CancellationException -> {
-                        return@finish
-                    }
-                }
-            }
-            loginFragment.displayState()
-        }, Task.UI_THREAD_EXECUTOR)
+            val profileTaskProvider = ProfileTaskProvider()
+            profileTaskProvider.loadProfileAsync(
+                state,
+                cancellationToken,
+                false
+            )
+        }
     }
+
 
     private fun getToken(loginModel: LoginModel): String {
         val gson = Gson()
@@ -94,7 +63,7 @@ class LoginTaskProvider {
                     gson.fromJson(jsonData, ResponseModel::class.java)
                 if (responseModel.status == STATUS_ERROR) {
                     val jsonMessage = responseModel.message
-                    throw LoginException("Error: $jsonMessage")
+                    throw LoginFragment.LoginException("Error: $jsonMessage")
                 }
 
                 if (responseModel.status == STATUS_OK) {
@@ -105,9 +74,6 @@ class LoginTaskProvider {
             }
         }
 
-        throw LoginException("Error: ")
+        throw LoginFragment.LoginException("Error: ")
     }
-
-    class LoginException(message: String) : Exception(message) {}
-    class CancellationException() : Exception() {}
 }

@@ -6,7 +6,6 @@ import com.example.emptyproject.Profile
 import com.example.emptyproject.State
 import com.example.emptyproject.fragments.LoginFragment
 import com.example.emptyproject.fragments.TOKEN
-import com.example.emptyproject.fragments.URL
 import com.example.emptyproject.models.ProfileModel
 import com.example.emptyproject.models.ResponseModel
 import com.google.gson.Gson
@@ -21,29 +20,31 @@ import java.util.Date
 class ProfileTaskProvider {
 
     fun loadProfileAsync(
-        token: String,
-        loginFragment: LoginFragment,
-        cancellationToken: CancellationToken
-    ): Task<Unit> {
-        val state = loginFragment.getState()
-
+        state: State,
+        cancellationToken: CancellationToken,
+        refresh: Boolean
+    ): Task<Profile> {
+        var profile = Profile()
         return Task.callInBackground {
             if (cancellationToken.isCancellationRequested) {
-                throw LoginTaskProvider.CancellationException()
+                throw LoginFragment.CancellationException()
             }
-            state?.let { getProfile(token, it) }
+            if (state.token != null) {
+                profile = getProfile(state.token!!, state, refresh)
+            }
+            profile
         }.onSuccess({
             if (cancellationToken.isCancellationRequested) {
-                throw LoginTaskProvider.CancellationException()
+                throw LoginFragment.CancellationException()
             }
-            loginFragment.dataSendListener?.sendProfile(it.result)
-            state?.profile = it.result
-        }, Task.UI_THREAD_EXECUTOR)
+            state.profile = it.result
+            state.profile
+        }, Task.BACKGROUND_EXECUTOR)
     }
 
-    private fun getProfile(token: String, state: State): Profile {
+    private fun getProfile(token: String, state: State, refresh: Boolean): Profile {
         val tokenObject = createTokenObject(token)
-        return sendProfileRequest(tokenObject, state)
+        return sendProfileRequest(tokenObject, state, refresh)
     }
 
     private fun createTokenObject(token: String): JSONObject {
@@ -52,12 +53,17 @@ class ProfileTaskProvider {
         return jsonTokenObject
     }
 
-    private fun sendProfileRequest(tokenObject: JSONObject, state: State): Profile {
+    private fun sendProfileRequest(tokenObject: JSONObject, state: State, refresh: Boolean): Profile {
+        val url: String = if (refresh) {
+            "https://pub.zame-dev.org/senla-training-addition/lesson-21.php?method=profile"
+        } else {
+            "https://pub.zame-dev.org/senla-training-addition/lesson-20.php?method=profile"
+        }
         val client = OkHttpClient()
         val requestBody = tokenObject.toString().toRequestBody()
         val request = Request.Builder()
             .method("POST", requestBody)
-            .url(URL + "profile")
+            .url(url)
             .build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected code $response")
@@ -97,5 +103,5 @@ class ProfileTaskProvider {
     }
 
 
-    class ProfileException(message: String) : Exception(message) {}
+    class ProfileException(message: String) : Exception(message)
 }
