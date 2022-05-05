@@ -1,6 +1,6 @@
 package com.example.emptyproject.fragments
 
-import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -45,8 +45,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         fun clickLogout()
     }
 
-    override fun onAttach(activity: Activity) {
-        super.onAttach(activity)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         clickLogoutListener = try {
             activity as OnSendClickLogout
         } catch (e: ClassCastException) {
