@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import bolts.Task
 import com.example.emptyproject.App
 import com.example.emptyproject.models.Post
 import com.example.emptyproject.PostsListAdapter
@@ -41,19 +42,18 @@ class PostsListFragment : Fragment(R.layout.fragment_posts_list) {
 
         val postsRecyclerView: RecyclerView = view.findViewById(R.id.posts_recycler_view)
 
-        posts = getPosts()
-        postsRecyclerView.layoutManager = LinearLayoutManager(activity)
-        postsRecyclerView.adapter = PostsListAdapter(posts, recyclerViewItemClickListener!!)
-    }
-
-    private fun getPosts(): ArrayList<Post> {
         val db = App.instance?.dBHelper?.readableDatabase
-        posts =  getPostsExecute(db)
-        db?.close()
-        return posts
+        getPostsExecute(db).onSuccess({
+            posts = it.result
+            postsRecyclerView.layoutManager = LinearLayoutManager(activity)
+            postsRecyclerView.adapter = PostsListAdapter(posts, recyclerViewItemClickListener!!)
+            db?.close()
+        }, Task.UI_THREAD_EXECUTOR)
+
     }
 
-    private fun getPostsExecute(db: SQLiteDatabase?): ArrayList<Post> {
+    private fun getPostsExecute(db: SQLiteDatabase?): Task<ArrayList<Post>> {
+        return Task.callInBackground {
         val cursor = db?.rawQuery("""SELECT title, email, body, user.id FROM post JOIN user ON userId == user.id""", null)
         val posts = arrayListOf<Post>()
         with (cursor) {
@@ -66,8 +66,9 @@ class PostsListFragment : Fragment(R.layout.fragment_posts_list) {
                 posts.add(post)
             }
         }
-        cursor?.close()
-        return posts
+            cursor?.close()
+            posts
+        }
     }
 
 }
