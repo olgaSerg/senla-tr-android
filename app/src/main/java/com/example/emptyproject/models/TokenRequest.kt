@@ -1,8 +1,10 @@
 package com.example.emptyproject.models
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class TokenRequest(
-    @SerializedName("token")
+@JsonClass(generateAdapter = true)
+data class TokenRequest(
+    @Json(name = "token")
     var token: String
 )

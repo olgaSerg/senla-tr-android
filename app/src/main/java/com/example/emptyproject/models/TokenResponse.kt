@@ -1,14 +1,16 @@
 package com.example.emptyproject.models
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class TokenResponse(
-    @SerializedName("status")
+    @Json(name = "status")
     var status: String,
 
-    @SerializedName("token")
+    @Json(name = "token")
     var token: String,
 
-    @SerializedName("message")
-    val message: String
+    @Json(name = "message")
+    val message: String?
 )

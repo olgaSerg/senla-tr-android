@@ -9,10 +9,12 @@ import com.example.emptyproject.models.LoginModel
 import com.example.emptyproject.models.Profile
 import com.example.emptyproject.models.State
 import com.example.emptyproject.models.TokenResponse
+import com.squareup.moshi.Moshi
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.IOException
 
 const val STATUS_OK = "ok"
@@ -46,7 +48,7 @@ class LoginTaskProvider {
     private fun getToken(loginModel: LoginModel): String {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create())
             .build()
 
         val apiService: ApiInterface = retrofit.create(ApiInterface::class.java)

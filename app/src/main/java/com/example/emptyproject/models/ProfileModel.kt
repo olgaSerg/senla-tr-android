@@ -1,16 +1,18 @@
 package com.example.emptyproject.models
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class ProfileModel(
-    @SerializedName("status")
+@JsonClass(generateAdapter = true)
+data class ProfileModel(
+    @Json(name = "status")
     val status: String,
-    @SerializedName("firstName")
+    @Json(name = "firstName")
     val firstName: String,
-    @SerializedName("lastName")
+    @Json(name = "lastName")
     val lastName: String,
-    @SerializedName("birthDate")
+    @Json(name = "birthDate")
     val birthDate: Int,
-    @SerializedName("notes")
+    @Json(name = "notes")
     val notes: String
 ) {}
