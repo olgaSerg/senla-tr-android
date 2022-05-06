@@ -29,6 +29,12 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,
         getMethods(testerClass)
     }
 
+    private fun getConstructors(testerClass: Class<*>) {
+        for (constructor in testerClass.constructors) {
+            Log.e("constructors", constructor.toString())
+        }
+    }
+
     private fun loadLoginFragment(state: State) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, LoginFragment.newInstance(state))
@@ -54,11 +60,7 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnDataSendListener,
         methodDoPrivate.invoke(tester)
     }
 
-    private fun getConstructors(testerClass: Class<*>) {
-        for (constructor in testerClass.constructors) {
-            Log.e("constructors", constructor.toString())
-        }
-    }
+
 
     private fun getAttributes(testerClass: Class<*>) {
         val fields = testerClass.declaredFields
