@@ -43,5 +43,6 @@ class PostsListAdapter(private val posts: List<Post>,
         val title: TextView = itemView.findViewById(R.id.title)
         val email: TextView = itemView.findViewById(R.id.email)
         val body: TextView = itemView.findViewById(R.id.body)
+
     }
 }

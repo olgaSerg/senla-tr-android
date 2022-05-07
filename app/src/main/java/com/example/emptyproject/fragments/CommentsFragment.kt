@@ -46,6 +46,7 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
                     arrayOf(selectionArgs)
                 )
             val comment = CommentModel()
+
             with(cursor) {
                 this?.moveToNext()
                 comment.userEmail = this?.getString(this.getColumnIndexOrThrow("email"))
