@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.app.Application
 import com.facebook.stetho.Stetho
 
-
 class App : Application() {
     var dBHelper: DBHelper? = null
     var db: SQLiteDatabase? = null
@@ -18,7 +17,7 @@ class App : Application() {
         dBHelper = DBHelper(this)
         db = dBHelper?.writableDatabase
 
-        Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this)
     }
 
     companion object {

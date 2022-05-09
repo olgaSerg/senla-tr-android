@@ -5,9 +5,11 @@ import android.os.Bundle
 import com.example.emptyproject.fragments.CommentsFragment
 import com.example.emptyproject.fragments.PostDetailsListFragment
 import com.example.emptyproject.fragments.PostsListFragment
+import com.example.emptyproject.fragments.StatisticsFragment
 
 class MainActivity : AppCompatActivity(), PostsListFragment.OnPostsRecyclerViewItemClickListener,
-    PostDetailsListFragment.OnClickButtonComments {
+    PostDetailsListFragment.OnClickButtonComments, PostsListFragment.OnButtonStatisticsClickListener {
+
     private val dbHelper = DBHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +40,14 @@ class MainActivity : AppCompatActivity(), PostsListFragment.OnPostsRecyclerViewI
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, CommentsFragment.newInstance(postId))
             addToBackStack("Comments")
+            commit()
+        }
+    }
+
+    override fun onClickStatistics() {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, StatisticsFragment.newInstance())
+            addToBackStack("Statistics")
             commit()
         }
     }

@@ -4,28 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.CommentsFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".fragments.CommentsFragment">
 
-    <TextView
-        android:id="@+id/text_view_email_comments"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comments_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:padding="10dp"
-        android:textAppearance="?android:attr/textAppearanceListItem"
-        app:layout_constraintBottom_toTopOf="@id/text_view_body_comments"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/text_view_body_comments"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_email_comments" />
 </androidx.constraintlayout.widget.ConstraintLayout>

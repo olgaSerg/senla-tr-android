@@ -50,14 +50,14 @@ class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail) {
         super.onViewCreated(view, savedInstanceState)
 
         title = view.findViewById(R.id.title)
-        email= view.findViewById(R.id.email)
-        fullName= view.findViewById(R.id.full_name)
-        body= view.findViewById(R.id.body)
+        email = view.findViewById(R.id.email)
+        fullName = view.findViewById(R.id.full_name)
+        body = view.findViewById(R.id.body)
         button = view.findViewById(R.id.button_comment)
 
         val button = button ?: return
 
-        val clickedPostId = arguments?.getInt("id")
+        val clickedPostId = arguments?.getInt(POST_ID)
         val db = App.instance?.dBHelper?.readableDatabase
         getPostDetails(clickedPostId!!, db).onSuccess({
             displayPostDetails(it.result)
@@ -69,12 +69,12 @@ class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail) {
         }, Task.UI_THREAD_EXECUTOR)
     }
 
-    private fun getPostDetails(id: Int,db: SQLiteDatabase?): Task<PostDetails> {
+    private fun getPostDetails(id: Int, db: SQLiteDatabase?): Task<PostDetails> {
         return Task.callInBackground {
             val selectionArgs = id.toString()
             val cursor =
                 db!!.rawQuery(
-                    """SELECT title, email, body, user.id, firstName || ' ' || lastName AS fullName FROM post JOIN user ON userId == user.id WHERE user.id == ?""",
+                    """SELECT title, email, body, post.id AS postId, fullName FROM post JOIN user ON userId == user.id WHERE post.id == ?""",
                     arrayOf(
                         selectionArgs
                     )
@@ -82,7 +82,7 @@ class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail) {
             val postDetails = PostDetails()
             with(cursor) {
                 moveToNext()
-                postDetails.id = getInt(getColumnIndexOrThrow("id"))
+                postDetails.id = getInt(getColumnIndexOrThrow("postId"))
                 postDetails.title = getString(getColumnIndexOrThrow("title"))
                 postDetails.email = getString(getColumnIndexOrThrow("email"))
                 postDetails.fullName = getString(getColumnIndexOrThrow("fullName"))
@@ -96,12 +96,12 @@ class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail) {
     private fun displayPostDetails(postDetails: PostDetails) {
         val title = title ?: return
         val email = email ?: return
-         val fullName = fullName ?: return
-         val body = body ?: return
+        val fullName = fullName ?: return
+        val body = body ?: return
 
-         title.text = postDetails.title
-         email.text = postDetails.email
-         fullName.text = postDetails.fullName
-         body.text = postDetails.body
-     }
+        title.text = postDetails.title
+        email.text = postDetails.email
+        fullName.text = postDetails.fullName
+        body.text = postDetails.body
+    }
 }

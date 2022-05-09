@@ -6,5 +6,4 @@ class PostDetails(
     var email: String? = null,
     var fullName: String? = null,
     var body: String? = null
-) {
-}
+)
