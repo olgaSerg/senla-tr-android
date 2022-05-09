@@ -30,9 +30,11 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
 
         val statisticsRecyclerView = statisticsRecyclerView ?: return
 
+        statisticsRecyclerView.layoutManager = LinearLayoutManager(activity)
+        statisticsRecyclerView.adapter = StatisticsListAdapter(arrayListOf())
+
         getStatistics().onSuccess({
             statistics = it.result
-            statisticsRecyclerView.layoutManager = LinearLayoutManager(activity)
             statisticsRecyclerView.adapter = StatisticsListAdapter(statistics)
         }, Task.UI_THREAD_EXECUTOR)
     }

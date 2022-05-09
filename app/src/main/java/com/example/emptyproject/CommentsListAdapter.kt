@@ -73,9 +73,9 @@ class CommentsListAdapter(private val comments: List<CommentModel>) :
         holder: ViewHolder,
         isIncrease: Boolean
     ) {
-        getRate(db, commentId, isIncrease).onSuccess {
+        getRate(db, commentId, isIncrease).onSuccess({
             holder.rate.text = it.result.toString()
-        }
+        }, Task.UI_THREAD_EXECUTOR)
     }
 
     override fun getItemCount(): Int {

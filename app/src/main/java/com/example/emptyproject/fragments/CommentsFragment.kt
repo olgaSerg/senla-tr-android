@@ -3,6 +3,7 @@ package com.example.emptyproject.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import bolts.Task
@@ -33,6 +34,9 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
 
         getComments(postId!!).onSuccess({
             comments = it.result
+            if (comments.isEmpty()) {
+                Toast.makeText(activity, "No comments to show!", Toast.LENGTH_SHORT).show();
+            }
             commentsRecyclerView.layoutManager = LinearLayoutManager(activity)
             commentsRecyclerView.adapter = CommentsListAdapter(comments)
         }, Task.UI_THREAD_EXECUTOR)
@@ -55,7 +59,7 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
                 )
             val comments = arrayListOf<CommentModel>()
 
-            with(cursor) {
+            with (cursor) {
                 while (moveToNext()) {
                     val comment = CommentModel()
                     comment.email = this?.getString(this.getColumnIndexOrThrow("email"))
