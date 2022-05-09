@@ -49,7 +49,9 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
                         FROM comment
                             JOIN post ON post.id == comment.postId
                             JOIN user ON user.id == comment.userId
-                        WHERE post.id == ?""", arrayOf(selectionArgs)
+                        WHERE post.id == ?
+                        ORDER BY comment.id
+                        """, arrayOf(selectionArgs)
                 )
             val comments = arrayListOf<CommentModel>()
 
