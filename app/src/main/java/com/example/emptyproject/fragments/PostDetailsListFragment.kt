@@ -11,6 +11,7 @@ import bolts.Task
 import com.example.emptyproject.App
 import com.example.emptyproject.models.PostDetails
 import com.example.emptyproject.R
+import java.io.IOException
 
 const val POST_ID = "id"
 
@@ -66,6 +67,10 @@ class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail) {
                 clickButtonComments?.onClickButtonComment(postDetails.id!!)
             }
             db?.close()
+        }, Task.UI_THREAD_EXECUTOR).continueWith({
+            if (it.isFaulted) {
+                title?.text = getString(R.string.error)
+            }
         }, Task.UI_THREAD_EXECUTOR)
     }
 

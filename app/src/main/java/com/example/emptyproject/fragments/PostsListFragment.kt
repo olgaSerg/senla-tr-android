@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import bolts.Task
@@ -13,6 +14,7 @@ import com.example.emptyproject.App
 import com.example.emptyproject.models.Post
 import com.example.emptyproject.PostsListAdapter
 import com.example.emptyproject.R
+import java.io.IOException
 
 class PostsListFragment : Fragment(R.layout.fragment_posts_list) {
 
@@ -65,6 +67,10 @@ class PostsListFragment : Fragment(R.layout.fragment_posts_list) {
             postsRecyclerView.layoutManager = LinearLayoutManager(activity)
             postsRecyclerView.adapter = PostsListAdapter(posts, recyclerViewItemClickListener!!)
             db?.close()
+        }, Task.UI_THREAD_EXECUTOR).continueWith({
+            if (it.isFaulted) {
+                Toast.makeText(activity, "Error!", Toast.LENGTH_SHORT).show()
+            }
         }, Task.UI_THREAD_EXECUTOR)
 
         buttonStatistics.setOnClickListener {

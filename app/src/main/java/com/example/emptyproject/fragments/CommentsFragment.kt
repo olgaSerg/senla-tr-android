@@ -11,6 +11,7 @@ import com.example.emptyproject.App
 import com.example.emptyproject.CommentsListAdapter
 import com.example.emptyproject.models.CommentModel
 import com.example.emptyproject.R
+import java.io.IOException
 
 class CommentsFragment : Fragment(R.layout.fragment_comments) {
 
@@ -35,10 +36,14 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
         getComments(postId!!).onSuccess({
             comments = it.result
             if (comments.isEmpty()) {
-                Toast.makeText(activity, "No comments to show!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "No comments to show!", Toast.LENGTH_SHORT).show()
             }
             commentsRecyclerView.layoutManager = LinearLayoutManager(activity)
             commentsRecyclerView.adapter = CommentsListAdapter(comments)
+        }, Task.UI_THREAD_EXECUTOR).continueWith({
+            if (it.isFaulted) {
+                Toast.makeText(activity, "Error!", Toast.LENGTH_SHORT).show()
+            }
         }, Task.UI_THREAD_EXECUTOR)
     }
 
@@ -74,17 +79,3 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
         }
     }
 }
-//        }.onSuccess {
-//            displayComments(it.result)
-//        }.continueWith(finish@{
-//            if (it.isFaulted) {
-//                when (it.error) {
-//                    is IOException -> {
-//                        textViewEmail?.text = getString(R.string.error)
-//                    }
-//                    is CancellationException -> {
-//                        return@finish
-//                    }
-//                }
-//            }
-//        }, Task.UI_THREAD_EXECUTOR)

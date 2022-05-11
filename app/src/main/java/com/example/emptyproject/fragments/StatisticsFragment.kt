@@ -3,6 +3,7 @@ package com.example.emptyproject.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
+import android.widget.Toast
 import androidx.core.database.getFloatOrNull
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +37,10 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
         getStatistics().onSuccess({
             statistics = it.result
             statisticsRecyclerView.adapter = StatisticsListAdapter(statistics)
+        }, Task.UI_THREAD_EXECUTOR).continueWith({
+            if (it.isFaulted) {
+                Toast.makeText(activity, "Error!", Toast.LENGTH_SHORT).show()
+            }
         }, Task.UI_THREAD_EXECUTOR)
     }
 
