@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="20dp"
-    android:background="@drawable/shape_line">
+    android:background="@drawable/shape_line"
+    android:paddingVertical="20dp">
 
     <TextView
         android:id="@+id/text_view_post"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="20dp"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,10 +22,10 @@
         android:id="@+id/text_view_title_comments_count"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Количество\nкомментариев:"
-        android:textSize="18sp"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/comments_count"
+        android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/text_view_comments_count"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_view_post" />
@@ -34,21 +34,21 @@
         android:id="@+id/text_view_comments_count"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="170dp"
         android:textSize="18sp"
-        android:layout_marginStart="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/text_view_title_comments_count"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_post"
-        app:layout_constraintBottom_toBottomOf="@id/text_view_title_comments_count"/>
+        app:layout_constraintTop_toBottomOf="@id/text_view_post" />
 
     <TextView
         android:id="@+id/text_view_title_average_rate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Средний рейтинг:"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/avg_rate"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/text_view_average_rate"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,11 +58,11 @@
         android:id="@+id/text_view_average_rate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="170dp"
         android:layout_marginStart="10dp"
+        android:layout_marginEnd="170dp"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_view_comments_count"
-        app:layout_constraintTop_toTopOf="@id/text_view_title_average_rate"/>
+        app:layout_constraintTop_toTopOf="@id/text_view_title_average_rate" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
