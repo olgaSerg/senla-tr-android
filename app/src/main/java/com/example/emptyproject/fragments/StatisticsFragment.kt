@@ -3,20 +3,19 @@ package com.example.emptyproject.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.widget.Toast
-import androidx.core.database.getFloatOrNull
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import bolts.Task
-import com.example.emptyproject.App
 import com.example.emptyproject.R
-import com.example.emptyproject.StatisticsListAdapter
+import com.example.emptyproject.adapters.StatisticsListAdapter
+import com.example.emptyproject.loaders.StatisticsLoader
 import com.example.emptyproject.models.Statistics
 
-class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
+class StatisticsFragment : Fragment(R.layout.fragment_statistics), LoaderManager.LoaderCallbacks<ArrayList<Statistics>> {
 
-    private var statistics: ArrayList<Statistics> = arrayListOf()
     private var statisticsRecyclerView: RecyclerView? = null
+    private var mLoaderManager: LoaderManager? = null
 
     companion object {
         fun newInstance(): StatisticsFragment {
@@ -28,48 +27,27 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
         super.onViewCreated(view, savedInstanceState)
 
         statisticsRecyclerView = view.findViewById(R.id.statistics_recycler_view)
-
-        val statisticsRecyclerView = statisticsRecyclerView ?: return
-
-        statisticsRecyclerView.layoutManager = LinearLayoutManager(activity)
-        statisticsRecyclerView.adapter = StatisticsListAdapter(arrayListOf())
-
-        getStatistics().onSuccess({
-            statistics = it.result
-            statisticsRecyclerView.adapter = StatisticsListAdapter(statistics)
-        }, Task.UI_THREAD_EXECUTOR).continueWith({
-            if (it.isFaulted) {
-                Toast.makeText(activity, "Error!", Toast.LENGTH_SHORT).show()
-            }
-        }, Task.UI_THREAD_EXECUTOR)
+        mLoaderManager = LoaderManager.getInstance(this)
+        if (mLoaderManager != null) {
+            mLoaderManager!!.initLoader(1, arguments, this)
+        }
     }
 
-    private fun getStatistics(): Task<ArrayList<Statistics>> {
-        return Task.callInBackground {
-            val db = App.instance?.dBHelper?.readableDatabase
-            val cursor =
-                db!!.rawQuery(
-                    """
-                        SELECT post.id, post.title, COUNT(comment.id) AS commentsCount, AVG(comment.rate) AS avgRate FROM post 
-                            LEFT JOIN comment ON post.id == comment.postId
-                        GROUP BY postId
-                        ORDER BY commentsCount DESC
-                        """, null
-                )
-            statistics.clear()
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<ArrayList<Statistics>> {
+       return StatisticsLoader(requireActivity())
+    }
 
-            with(cursor) {
-                while (moveToNext()) {
-                    val statistic = Statistics()
-                    statistic.postName = this?.getString(this.getColumnIndexOrThrow("title"))!!
-                    statistic.commentsCount = getInt(getColumnIndexOrThrow("commentsCount"))
-
-                    val avgRateColIndex = getColumnIndexOrThrow("avgRate")
-                    statistic.averageRate = getFloatOrNull(avgRateColIndex) ?: 0.0f
-                    statistics.add(statistic)
-                }
-                statistics
-            }
+    override fun onLoadFinished(
+        loader: Loader<ArrayList<Statistics>>,
+        data: ArrayList<Statistics>?
+    ) {
+        statisticsRecyclerView?.layoutManager = LinearLayoutManager(activity)
+        if (data != null) {
+            statisticsRecyclerView?.adapter = StatisticsListAdapter(data)
         }
+    }
+
+    override fun onLoaderReset(loader: Loader<ArrayList<Statistics>>) {
+        loader.cancelLoad()
     }
 }

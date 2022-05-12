@@ -1,27 +1,27 @@
 package com.example.emptyproject.fragments
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import bolts.Task
-import com.example.emptyproject.App
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.Loader
 import com.example.emptyproject.models.PostDetails
 import com.example.emptyproject.R
-import java.io.IOException
+import com.example.emptyproject.loaders.PostDetailLoader
 
 const val POST_ID = "id"
 
-class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail) {
+class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail), LoaderManager.LoaderCallbacks<PostDetails> {
 
     private var title: TextView? = null
     private var email: TextView? = null
     private var fullName: TextView? = null
     private var body: TextView? = null
     private var button: Button? = null
+    private var mLoaderManager: LoaderManager? = null
     private var clickButtonComments: OnClickButtonComments? = null
 
     companion object {
@@ -56,46 +56,8 @@ class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail) {
         body = view.findViewById(R.id.body)
         button = view.findViewById(R.id.button_comment)
 
-        val button = button ?: return
-
-        val clickedPostId = arguments?.getInt(POST_ID)
-        val db = App.instance?.dBHelper?.readableDatabase
-        getPostDetails(clickedPostId!!, db).onSuccess({
-            displayPostDetails(it.result)
-            val postDetails = it.result
-            button.setOnClickListener {
-                clickButtonComments?.onClickButtonComment(postDetails.id!!)
-            }
-            db?.close()
-        }, Task.UI_THREAD_EXECUTOR).continueWith({
-            if (it.isFaulted) {
-                title?.text = getString(R.string.error)
-            }
-        }, Task.UI_THREAD_EXECUTOR)
-    }
-
-    private fun getPostDetails(id: Int, db: SQLiteDatabase?): Task<PostDetails> {
-        return Task.callInBackground {
-            val selectionArgs = id.toString()
-            val cursor =
-                db!!.rawQuery(
-                    """SELECT title, email, body, post.id AS postId, fullName FROM post JOIN user ON userId == user.id WHERE post.id == ?""",
-                    arrayOf(
-                        selectionArgs
-                    )
-                )
-            val postDetails = PostDetails()
-            with(cursor) {
-                moveToNext()
-                postDetails.id = getInt(getColumnIndexOrThrow("postId"))
-                postDetails.title = getString(getColumnIndexOrThrow("title"))
-                postDetails.email = getString(getColumnIndexOrThrow("email"))
-                postDetails.fullName = getString(getColumnIndexOrThrow("fullName"))
-                postDetails.body = getString(getColumnIndexOrThrow("body"))
-            }
-            cursor?.close()
-            postDetails
-        }
+        mLoaderManager = LoaderManager.getInstance(this)
+        mLoaderManager?.initLoader(1, arguments, this)
     }
 
     private fun displayPostDetails(postDetails: PostDetails) {
@@ -108,5 +70,25 @@ class PostDetailsListFragment : Fragment(R.layout.fragment_post_detail) {
         email.text = postDetails.email
         fullName.text = postDetails.fullName
         body.text = postDetails.body
+    }
+
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<PostDetails> {
+        return PostDetailLoader(requireActivity(), args!!)
+    }
+
+    override fun onLoadFinished(
+        loader: Loader<PostDetails>,
+        data: PostDetails?
+    ) {
+        val button = button ?: return
+        if (data != null) {
+            displayPostDetails(data)
+            button.setOnClickListener {
+                clickButtonComments?.onClickButtonComment(data.id!!)
+            }
+        }
+    }
+
+    override fun onLoaderReset(loader: Loader<PostDetails>) {
     }
 }

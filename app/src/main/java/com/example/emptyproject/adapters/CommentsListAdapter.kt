@@ -1,4 +1,4 @@
-package com.example.emptyproject
+package com.example.emptyproject.adapters
 
 import android.database.sqlite.SQLiteDatabase
 import android.view.LayoutInflater
@@ -8,8 +8,9 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import bolts.Task
+import com.example.emptyproject.App
+import com.example.emptyproject.R
 import com.example.emptyproject.models.CommentModel
-
 
 class CommentsListAdapter(private val comments: List<CommentModel>) :
     RecyclerView.Adapter<CommentsListAdapter.ViewHolder>() {
@@ -24,58 +25,60 @@ class CommentsListAdapter(private val comments: List<CommentModel>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val adapterPosition = holder.adapterPosition
         bind(holder, adapterPosition)
-        val db = App.instance?.dBHelper?.writableDatabase
-        val commentId = comments[adapterPosition].commentId
-
-        var commentRate = comments[adapterPosition].rate
-        var isIncrease: Boolean
-        if (commentRate != null) {
-            holder.imageButtonThumbUp.setOnClickListener {
-                commentRate++
-                isIncrease = true
-                updateRate(db!!, commentId!!, holder, isIncrease)
-            }
-            holder.imageButtonThumbDown.setOnClickListener {
-                commentRate--
-                isIncrease = false
-                updateRate(db!!, commentId!!, holder, isIncrease)
-            }
-        }
     }
 
     private fun bind(holder: ViewHolder, adapterPosition: Int) {
         holder.email.text  = comments[adapterPosition].email
         holder.comment.text = comments[adapterPosition].text
         holder.rate.text = comments[adapterPosition].rate.toString()
+
+        val db = App.instance?.dBHelper?.writableDatabase ?: return
+        setUpdateRateClickListeners(holder, db)
     }
 
-    private fun getRate(db: SQLiteDatabase, commentId: Int, isIncrease: Boolean): Task<Int> {
-        return Task.callInBackground {
-            val sign = if (isIncrease) {
-                "+"
-            } else {
-                "-"
+    private fun setUpdateRateClickListeners(holder: ViewHolder, db: SQLiteDatabase) {
+        val commentId = comments[holder.adapterPosition].commentId
+        var commentRate = comments[holder.adapterPosition].rate
+        if (commentRate != null) {
+            holder.imageButtonThumbUp.setOnClickListener {
+                commentRate++
+                updateRate(commentId!!, holder, commentRate, db)
             }
-            db.execSQL("""UPDATE comment SET rate = rate $sign 1 WHERE comment.id == $commentId""")
-            val cursor =
-                db.rawQuery("""SELECT rate FROM comment WHERE id == $commentId""", null)
-            with(cursor) {
-                this?.moveToNext()
-                val rate = this?.getInt(getColumnIndexOrThrow("rate"))
-                rate
+            holder.imageButtonThumbDown.setOnClickListener {
+                commentRate--
+                updateRate(commentId!!, holder, commentRate, db)
             }
         }
     }
 
     private fun updateRate(
-        db: SQLiteDatabase,
         commentId: Int,
         holder: ViewHolder,
-        isIncrease: Boolean
+        commentRate: Int,
+        db: SQLiteDatabase
     ) {
-        getRate(db, commentId, isIncrease).onSuccess({
+        setNewRate(commentId, commentRate, db).onSuccess({
             holder.rate.text = it.result.toString()
         }, Task.UI_THREAD_EXECUTOR)
+    }
+
+
+    private fun setNewRate(commentId: Int, commentRate: Int, db: SQLiteDatabase): Task<Int> {
+        return Task.callInBackground {
+            db.execSQL("""UPDATE comment SET rate = $commentRate WHERE comment.id == $commentId""")
+        }.onSuccessTask { getRate(db, commentId) }
+    }
+
+    private fun getRate(db: SQLiteDatabase, commentId: Int): Task<Int> {
+        return Task.callInBackground {
+            val cursor =
+                db.rawQuery("""SELECT rate FROM comment WHERE id == $commentId""", null)
+            with(cursor) {
+                moveToNext()
+                val rate = getInt(getColumnIndexOrThrow("rate"))
+                rate
+            }
+        }
     }
 
     override fun getItemCount(): Int {

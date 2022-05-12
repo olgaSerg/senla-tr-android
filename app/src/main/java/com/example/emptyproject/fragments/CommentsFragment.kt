@@ -3,19 +3,21 @@ package com.example.emptyproject.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.widget.Toast
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import bolts.Task
-import com.example.emptyproject.App
-import com.example.emptyproject.CommentsListAdapter
+import com.example.emptyproject.adapters.CommentsListAdapter
 import com.example.emptyproject.models.CommentModel
 import com.example.emptyproject.R
-import java.io.IOException
+import com.example.emptyproject.dialogs.CommentsDialogFragment
+import com.example.emptyproject.loaders.CommentsLoader
 
-class CommentsFragment : Fragment(R.layout.fragment_comments) {
+class CommentsFragment : Fragment(R.layout.fragment_comments),
+    LoaderManager.LoaderCallbacks<ArrayList<CommentModel>> {
 
-    private var comments: ArrayList<CommentModel> = arrayListOf()
+    private var commentsRecyclerView: RecyclerView? = null
+    private var mLoaderManager: LoaderManager? = null
 
     companion object {
         fun newInstance(postId: Int): CommentsFragment {
@@ -25,57 +27,42 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
             commentsFragment.arguments = args
             return commentsFragment
         }
+
+        const val MESSAGE = "No comments to show"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val postId = arguments?.getInt("id")
-        val commentsRecyclerView: RecyclerView = view.findViewById(R.id.comments_recycler_view)
-
-        getComments(postId!!).onSuccess({
-            comments = it.result
-            if (comments.isEmpty()) {
-                Toast.makeText(activity, "No comments to show!", Toast.LENGTH_SHORT).show()
-            }
-            commentsRecyclerView.layoutManager = LinearLayoutManager(activity)
-            commentsRecyclerView.adapter = CommentsListAdapter(comments)
-        }, Task.UI_THREAD_EXECUTOR).continueWith({
-            if (it.isFaulted) {
-                Toast.makeText(activity, "Error!", Toast.LENGTH_SHORT).show()
-            }
-        }, Task.UI_THREAD_EXECUTOR)
+        commentsRecyclerView = view.findViewById(R.id.comments_recycler_view)
+        mLoaderManager = LoaderManager.getInstance(this)
+        if (mLoaderManager != null) {
+            mLoaderManager!!.initLoader(1, arguments, this)
+        }
     }
 
-    private fun getComments(postId: Int): Task<ArrayList<CommentModel>> {
-        return Task.callInBackground {
-            val db = App.instance?.dBHelper?.readableDatabase
-            val selectionArgs = postId.toString()
-            val cursor =
-                db!!.rawQuery(
-                    """
-                        SELECT user.email, comment.text, comment.rate, comment.id
-                        FROM comment
-                            JOIN post ON post.id == comment.postId
-                            JOIN user ON user.id == comment.userId
-                        WHERE post.id == ?
-                        ORDER BY comment.id
-                        """, arrayOf(selectionArgs)
-                )
-            val comments = arrayListOf<CommentModel>()
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<ArrayList<CommentModel>> {
+        return CommentsLoader(requireActivity(), args!!)
+    }
 
-            with (cursor) {
-                while (moveToNext()) {
-                    val comment = CommentModel()
-                    comment.email = this?.getString(this.getColumnIndexOrThrow("email"))
-                    comment.text = this?.getString(getColumnIndexOrThrow("text"))
-                    comment.rate = this?.getInt(getColumnIndexOrThrow("rate"))
-                    comment.commentId = this?.getInt(getColumnIndexOrThrow("id"))
-                    comments.add(comment)
+    override fun onLoadFinished(
+        loader: Loader<ArrayList<CommentModel>>,
+        data: ArrayList<CommentModel>?
+    ) {
+        if (data != null) {
+            if (data.size == 0) {
+                val errorDialogFragment = CommentsDialogFragment()
+                errorDialogFragment.show(childFragmentManager, "error")
+            } else {
+                if (commentsRecyclerView != null) {
+                    commentsRecyclerView!!.layoutManager = LinearLayoutManager(activity)
+                    commentsRecyclerView!!.adapter = CommentsListAdapter(data)
                 }
             }
-            cursor.close()
-            comments
         }
+    }
+
+    override fun onLoaderReset(loader: Loader<ArrayList<CommentModel>>) {
+        loader.cancelLoad()
     }
 }
