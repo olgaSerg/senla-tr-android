@@ -58,9 +58,9 @@ class ProfileTaskProvider {
         val apiService: ApiInterface = retrofit.create(ApiInterface::class.java)
         val call: Call<ProfileModel> =
             if (refresh)
-                apiService.refreshProfileRequest(tokenRequest)
+                apiService.sendProfileRequest("21", tokenRequest)
             else
-                apiService.sendProfileRequest(tokenRequest)
+                apiService.sendProfileRequest("20", tokenRequest)
         val response: Response<ProfileModel> = call.execute()
         if (!response.isSuccessful) throw IOException()
 
