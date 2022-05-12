@@ -8,6 +8,7 @@ import bolts.Task
 import com.example.emptyproject.App
 import com.example.emptyproject.models.CommentModel
 import com.example.emptyproject.R
+import com.example.emptyproject.providers.CommentsProvider
 import java.io.IOException
 import java.util.concurrent.CancellationException
 
@@ -33,29 +34,9 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
         textViewBodyComment = view.findViewById(R.id.text_view_body_comments)
 
         val postId = arguments?.getInt("id")
-        getComments(postId!!)
-    }
-
-    private fun getComments(postId: Int) {
-        Task.callInBackground {
-            val db = App.instance?.dBHelper?.readableDatabase
-            val selectionArgs = postId.toString()
-            val cursor =
-                db?.rawQuery(
-                    """SELECT email, text FROM comment JOIN user ON userId == user.id WHERE user.id == ?""",
-                    arrayOf(selectionArgs)
-                )
-            val comment = CommentModel()
-
-            with(cursor) {
-                this?.moveToNext()
-                comment.userEmail = this?.getString(this.getColumnIndexOrThrow("email"))
-                comment.text = this?.getString(getColumnIndexOrThrow("text"))
-                cursor?.close()
-                db?.close()
-                comment
-            }
-        }.onSuccess {
+        val db = App.instance?.dBHelper?.readableDatabase ?: return
+        val commentsProvider = CommentsProvider()
+        commentsProvider.getComments(postId!!, db).onSuccess {
             displayComments(it.result)
         }.continueWith(finish@{
             if (it.isFaulted) {

@@ -8,7 +8,7 @@ import com.facebook.stetho.Stetho
 
 class App : Application() {
     var dBHelper: DBHelper? = null
-    var db: SQLiteDatabase? = null
+    private var db: SQLiteDatabase? = null
         private set
 
     override fun onCreate() {

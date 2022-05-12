@@ -5,12 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
-
 import androidx.recyclerview.widget.RecyclerView
 import com.example.emptyproject.fragments.PostsListFragment
 import com.example.emptyproject.models.Post
-
 
 class PostsListAdapter(private val posts: List<Post>,
                        private val recyclerViewItemClickListener: PostsListFragment.OnPostsRecyclerViewItemClickListener):
@@ -25,6 +22,10 @@ class PostsListAdapter(private val posts: List<Post>,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val adapterPosition = holder.adapterPosition
+        bind(holder, adapterPosition)
+    }
+
+    private fun bind(holder: ViewHolder, adapterPosition: Int) {
         holder.title.text = posts[adapterPosition].title
         holder.email.text = posts[adapterPosition].email
         holder.body.text = posts[adapterPosition].body
@@ -43,6 +44,5 @@ class PostsListAdapter(private val posts: List<Post>,
         val title: TextView = itemView.findViewById(R.id.title)
         val email: TextView = itemView.findViewById(R.id.email)
         val body: TextView = itemView.findViewById(R.id.body)
-
     }
 }

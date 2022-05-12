@@ -1,7 +1,6 @@
 package com.example.emptyproject.fragments
 
-import android.app.Activity
-import android.database.sqlite.SQLiteDatabase
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
@@ -12,6 +11,7 @@ import com.example.emptyproject.App
 import com.example.emptyproject.models.Post
 import com.example.emptyproject.PostsListAdapter
 import com.example.emptyproject.R
+import com.example.emptyproject.providers.PostsProvider
 
 class PostsListFragment : Fragment(R.layout.fragment_posts_list) {
 
@@ -28,8 +28,8 @@ class PostsListFragment : Fragment(R.layout.fragment_posts_list) {
         fun onClick(id: Int)
     }
 
-    override fun onAttach(activity: Activity) {
-        super.onAttach(activity)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         recyclerViewItemClickListener = try {
             activity as OnPostsRecyclerViewItemClickListener
         } catch (e: ClassCastException) {
@@ -42,33 +42,13 @@ class PostsListFragment : Fragment(R.layout.fragment_posts_list) {
 
         val postsRecyclerView: RecyclerView = view.findViewById(R.id.posts_recycler_view)
 
-        val db = App.instance?.dBHelper?.readableDatabase
-        getPostsExecute(db).onSuccess({
+        val db = App.instance?.dBHelper?.readableDatabase ?: return
+        val postsProvider = PostsProvider()
+        postsProvider.getPostsExecute(db).onSuccess({
             posts = it.result
             postsRecyclerView.layoutManager = LinearLayoutManager(activity)
             postsRecyclerView.adapter = PostsListAdapter(posts, recyclerViewItemClickListener!!)
-            db?.close()
+            db.close()
         }, Task.UI_THREAD_EXECUTOR)
-
     }
-
-    private fun getPostsExecute(db: SQLiteDatabase?): Task<ArrayList<Post>> {
-        return Task.callInBackground {
-        val cursor = db?.rawQuery("""SELECT title, email, body, user.id FROM post JOIN user ON userId == user.id""", null)
-        val posts = arrayListOf<Post>()
-        with (cursor) {
-            while (this!!.moveToNext()) {
-                val post = Post()
-                post.id = getInt(getColumnIndexOrThrow("id"))
-                post.title = getString(getColumnIndexOrThrow("title"))
-                post.email = getString(getColumnIndexOrThrow("email"))
-                post.body = getString(getColumnIndexOrThrow("body"))
-                posts.add(post)
-            }
-        }
-            cursor?.close()
-            posts
-        }
-    }
-
 }
