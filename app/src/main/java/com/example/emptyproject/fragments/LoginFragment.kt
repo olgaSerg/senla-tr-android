@@ -12,6 +12,7 @@ import androidx.core.widget.addTextChangedListener
 import bolts.Task
 import java.lang.ClassCastException
 import bolts.CancellationTokenSource
+import com.example.emptyproject.Exceptions
 import com.example.emptyproject.R
 import com.example.emptyproject.models.State
 import com.example.emptyproject.MainActivity
@@ -173,13 +174,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                         is IOException -> {
                             state?.errorText = getString(R.string.error_message)
                         }
-                        is LoginException -> {
+                        is Exceptions.LoginException -> {
                             state?.errorText = it.error.message.toString()
                         }
                         is ProfileTaskProvider.ProfileException -> {
                             state?.errorText = it.error.message.toString()
                         }
-                        is CancellationException -> {
+                        is Exceptions.CancellationException -> {
                             return@finish
                         }
                     }
@@ -189,7 +190,4 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             }, Task.UI_THREAD_EXECUTOR)
         }
     }
-
-    class LoginException(message: String) : Exception(message) {}
-    class CancellationException() : Exception() {}
 }

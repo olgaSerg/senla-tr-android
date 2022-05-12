@@ -1,19 +1,16 @@
 package com.example.emptyproject.providers
 
-import android.util.Log
 import bolts.CancellationToken
 import bolts.Task
 import com.example.emptyproject.ApiInterface
-import com.example.emptyproject.fragments.LoginFragment
+import com.example.emptyproject.Exceptions
 import com.example.emptyproject.models.LoginModel
 import com.example.emptyproject.models.Profile
 import com.example.emptyproject.models.State
 import com.example.emptyproject.models.TokenResponse
-import com.squareup.moshi.Moshi
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.IOException
 
@@ -29,7 +26,7 @@ class LoginTaskProvider {
     ): Task<Profile> {
         return Task.call({
             if (cancellationToken.isCancellationRequested) {
-                throw LoginFragment.CancellationException()
+                throw Exceptions.CancellationException()
             }
             if (state.token == null) {
                 val loginModel = LoginModel(state.email, state.password)
@@ -45,6 +42,7 @@ class LoginTaskProvider {
         }
     }
 
+    @Throws(Exceptions.LoginException::class)
     private fun getToken(loginModel: LoginModel): String {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -58,13 +56,13 @@ class LoginTaskProvider {
 
         if (response.body() != null) {
             if (response.body()?.status == STATUS_ERROR) {
-                throw LoginFragment.LoginException("Error: ${response.body()?.message}")
+                throw Exceptions.LoginException("Error: ${response.body()?.message}")
             }
 
             if (response.body()?.status == STATUS_OK) {
                 return response.body()?.token.toString()
             }
         }
-        throw LoginFragment.LoginException("Error: ${response.body()?.message}")
+        throw Exceptions.LoginException("Error: ${response.body()?.message}")
     }
 }

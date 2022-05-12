@@ -3,15 +3,14 @@ package com.example.emptyproject.providers
 import bolts.CancellationToken
 import bolts.Task
 import com.example.emptyproject.ApiInterface
+import com.example.emptyproject.Exceptions
 import com.example.emptyproject.models.Profile
 import com.example.emptyproject.models.State
-import com.example.emptyproject.fragments.LoginFragment
 import com.example.emptyproject.models.ProfileModel
 import com.example.emptyproject.models.TokenRequest
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -27,7 +26,7 @@ class ProfileTaskProvider {
         var profile = Profile()
         return Task.callInBackground {
             if (cancellationToken.isCancellationRequested) {
-                throw LoginFragment.CancellationException()
+                throw CancellationException()
             }
             if (state.token != null) {
                 profile = getProfile(state.token!!, state, refresh)
@@ -35,9 +34,12 @@ class ProfileTaskProvider {
             profile
         }.onSuccess({
             if (cancellationToken.isCancellationRequested) {
-                throw LoginFragment.CancellationException()
+                throw CancellationException()
             }
             state.profile = it.result
+            if (state.profile == null) {
+                throw ProfileException("Error: ProfileException")
+            }
             state.profile
         }, Task.BACKGROUND_EXECUTOR)
     }
@@ -47,6 +49,7 @@ class ProfileTaskProvider {
         return fillProfile(tokenRequest, state, refresh)
     }
 
+    @Throws(Exceptions.LoginException::class)
     private fun fillProfile(tokenRequest: TokenRequest, state: State, refresh: Boolean): Profile {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -87,5 +90,6 @@ class ProfileTaskProvider {
         return dateFormat.format(date)
     }
 
-    class ProfileException(message: String) : Exception(message) {}
+    class ProfileException(message: String) : Exception(message)
+    class CancellationException() : Exception()
 }
